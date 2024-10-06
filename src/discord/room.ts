@@ -6,7 +6,12 @@ import {
   type RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10';
 
-import {CSCGo, type MachineType, type RoomMachine, type RoomSummary} from '../cscgo';
+import {
+  CSCGo,
+  type MachineType,
+  type RoomMachine,
+  type RoomSummary,
+} from '../cscgo';
 import {toRoomName} from '../util/room';
 import {capitalize} from '@benricheson101/util';
 

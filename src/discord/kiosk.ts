@@ -14,7 +14,11 @@ export const generateKioskMessage = (
 ): RESTPostAPIChannelMessageJSONBody => {
   const rooms = data.location.rooms.reduce<{
     [key: string]: LocationSummary['rooms'][number];
-  }>((a, c) => (c.roomId in data.rooms && c.connected ? ((a[c.roomId] = c), a) : a), {});
+  }>(
+    (a, c) =>
+      c.roomId in data.rooms && c.connected ? ((a[c.roomId] = c), a) : a,
+    {}
+  );
 
   const embed: APIEmbed = {
     title: 'Laundry Status',
@@ -24,16 +28,15 @@ export const generateKioskMessage = (
     },
     //fields: Object.entries(data.rooms)
     //  .toSorted(([a], [b]) => Number(a.split('-')[1]) - Number(b.split('-')[1]))
-    fields: data.sortedRooms
-      .map(([room, status]) => ({
-        name: toRoomName(rooms[room]!),
-        inline: true,
-        value: [
-          `Washers: **${status.washer.available.length}/${status.washer.total}** available`,
-          `Dryers: **${status.dryer.available.length}/${status.dryer.total}** available`,
-          `[View Online](https://mycscgo.com/laundry/summary/${data.location.locationId}/${room})`,
-        ].join('\n'),
-      })),
+    fields: data.sortedRooms.map(([room, status]) => ({
+      name: toRoomName(rooms[room]!),
+      inline: true,
+      value: [
+        `Washers: **${status.washer.available.length}/${status.washer.total}** available`,
+        `Dryers: **${status.dryer.available.length}/${status.dryer.total}** available`,
+        `[View Online](https://mycscgo.com/laundry/summary/${data.location.locationId}/${room})`,
+      ].join('\n'),
+    })),
     footer: {
       text: 'Last updated',
     },
