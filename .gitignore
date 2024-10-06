@@ -1,0 +1,11 @@
+/build
+/node_modules
+*.log
+/.env
+/locationSummary.json
+/roomMachines.json
+/roomSummary.json
+/room_rename.json
+/room_statuses.json
+/db/database.sqlite3
+*.vim
