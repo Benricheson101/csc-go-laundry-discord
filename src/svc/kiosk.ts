@@ -1,35 +1,22 @@
 import {chunk} from '@benricheson101/util';
 
-import type {
-  AllRoomMachineStatuses,
-  CSCGo,
-} from '../cscgo';
+import type {AllRoomMachineStatuses, CSCGo} from '../cscgo';
 import type {Database} from '../db';
 import type {DiscordAPI} from '../discord/api';
 import {generateKioskMessage} from '../discord/kiosk';
-import type {Service} from '.';
 import {hashRooms} from '../util/room';
 
 const MAX_ROOMS_PER_KIOSK = 24; // multiple of 3
 
-export class KioskService implements Service {
+export class KioskService {
   constructor(
     private db: Database,
     private dapi: DiscordAPI,
     private cscgo: CSCGo
   ) {}
 
-  async start(): Promise<void> {
-    this.run();
-    setInterval(() => {
-      this.run();
-    }, 60_000);
-  }
-
-  async run() {
+  async run(roomStatuses: AllRoomMachineStatuses) {
     console.log(new Date(), '[KioskService] Running');
-
-    const roomStatuses = await this.cscgo.getAllRoomMachineStatuses();
     const roomStatusChunks: AllRoomMachineStatuses[] = chunk(
       roomStatuses.sortedRooms,
       MAX_ROOMS_PER_KIOSK

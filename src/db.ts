@@ -1,5 +1,7 @@
 import BetterSqlite3 from 'better-sqlite3';
 
+// TODO: make prepared queries constants?
+
 export class Database {
   #db: BetterSqlite3.Database;
 
@@ -7,25 +9,22 @@ export class Database {
     this.#db = new BetterSqlite3(dbFile);
   }
 
-  createMachineSubscription(user: string, machineID: number) {
+  createMachineSubscription(user: string, machineID: number, roomID: string) {
     return this.#db
       .prepare(`
-        insert into subscriptions (type, user_id, machine_id)
-        values (0, ?, ?);
+        insert into subscriptions (type, user_id, machine_id, room_id)
+        values (?, ?, ?, ?);
       `)
-      .run(user, machineID);
+      .run(SubscriptionType.Machine, user, machineID, roomID);
   }
 
-  deleteMachineSubscription(user: string, machineID: number) {
+  deleteSubscription(id: number) {
     return this.#db
       .prepare(`
         delete from subscriptions
-        where
-          type = 0
-          and user_id = ?
-          and machine_id = ?;
+        where id = ?
       `)
-      .run(user, machineID);
+      .run(id);
   }
 
   getMachineSubscriptionsForMachine(machineID: number): Subscription[] {
@@ -50,6 +49,15 @@ export class Database {
           and user_id = ?;
       `)
       .all(user) as Subscription[];
+  }
+
+  getActiveSubscriptions() {
+    return this.#db
+      .prepare(`
+      select *
+      from subscriptions
+    `)
+      .all() as Subscription[];
   }
 
   createKioskMessage(
@@ -161,7 +169,7 @@ export class Database {
 }
 
 export enum SubscriptionType {
-  Individual = 0,
+  Machine = 0,
   NextAvailable = 1,
 }
 
@@ -171,21 +179,28 @@ export enum DBMachineType {
   Dryer = 1,
 }
 
-export type Subscription = {
+type MakeSubscription<Type extends SubscriptionType, Data> = {
   id: number;
   user_id: string;
-} & (
-  | {
-      type: SubscriptionType.Individual;
-      // FIXME: database doesn't guarantee this to be not null, but it should always be. making that assumption here but it's unsafe (change this??)
-      machine_id: number;
-    }
-  | {
-      type: SubscriptionType.NextAvailable;
-      // FIXME: database doesn't guarantee this to be not null, but it should always be. making that assumption here but it's unsafe (change this??)
-      machine_type: 'W' | 'D';
-    }
-);
+  room_id: string;
+  type: Type;
+} & Data;
+
+export type MachineSubscription = MakeSubscription<
+  SubscriptionType.Machine,
+  {
+    machine_id: number;
+  }
+>;
+
+export type NextAvailableSubscription = MakeSubscription<
+  SubscriptionType.NextAvailable,
+  {
+    machine_type: DBMachineType;
+  }
+>;
+
+export type Subscription = MachineSubscription | NextAvailableSubscription;
 
 export type KioskMessage = {
   id: number;
@@ -194,3 +209,8 @@ export type KioskMessage = {
   guild_id: string;
   last_update_hash: string;
 };
+
+export const DBMachineTypeMap = {
+  [DBMachineType.Washer]: 'washer',
+  [DBMachineType.Dryer]: 'dryer',
+} as const;

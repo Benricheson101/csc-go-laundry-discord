@@ -63,6 +63,10 @@ export class CSCGo {
     return {location, rooms: agg, sortedRooms};
   }
 
+  roomLink(roomID: string) {
+    return `https://mycscgo.com/laundry/summary/${this.locationID}/${roomID}`;
+  }
+
   static classifyMachine(machine: RoomMachine): MachineClassification {
     switch (true) {
       case machine.available && machine.mode === MachineMode.PressStart: // TODO: is this this the right place
