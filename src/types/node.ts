@@ -5,5 +5,6 @@ declare namespace NodeJS {
     PORT: string;
     INTERVAL: string;
     LOG_LEVEL: 'verbose' | 'debug' | 'info' | 'warn' | 'error';
+    DATABASE_PATH: string;
   }
 }

@@ -26,11 +26,13 @@ assert(location);
 const discordToken = process.env.DISCORD_TOKEN;
 assert(discordToken);
 
+const dbFile = process.env.DATABASE_PATH || './db/database.sqlite3';
+
 const main = async () => {
   const logger = Logger.withValues({service: 'main'});
 
   const dapi = new DiscordAPI(discordToken);
-  const db = new Database('./db/database.sqlite3');
+  const db = new Database(dbFile);
   const cscgo = new CSCGo(location);
   await cscgo.populateCache();
 

@@ -1,4 +1,3 @@
-import {execSync} from 'node:child_process';
 import type {
   APIApplicationCommandInteraction,
   RESTPostAPIApplicationCommandsJSONBody,
@@ -9,13 +8,7 @@ import type {Context} from '../interaction';
 
 const SUPPORT_DISCORD = 'https://discord.gg/GmaW9dYwZf';
 const GITHUB_URL = 'https://github.com/Benricheson101/csc-go-laundry-discord';
-
-let gitRevision: string;
-try {
-  gitRevision = execSync('git rev-parse --short HEAD').toString().trim();
-} catch (err) {
-  gitRevision = 'unknown';
-}
+const GIT_REVISION = process.env.GIT_COMMIT || 'unknown';
 
 export class InfoCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {
@@ -26,7 +19,7 @@ export class InfoCommand extends Command {
   async run(ctx: Context<APIApplicationCommandInteraction>) {
     const msg = [
       `**Source Code**: <${GITHUB_URL}>`,
-      `**Version**: [${gitRevision}](<${GITHUB_URL}${gitRevision === 'unknown' ? '' : `/tree/${gitRevision}`}>)`,
+      `**Version**: [${GIT_REVISION}](<${GITHUB_URL}${GIT_REVISION === 'unknown' ? '' : `/tree/${GIT_REVISION}`}>)`,
 
       `-# Need help? Join my [support Discord server](${SUPPORT_DISCORD}) and send me a message`,
     ].join('\n');

@@ -1,0 +1,27 @@
+services:
+  migrate:
+    image: amacneil/dbmate
+    command: up
+    environment:
+      DATABASE_URL: sqlite3:${DATABASE_PATH}
+      DBMATE_WAIT: 'true'
+    env_file:
+      - .env
+    volumes:
+      - ./db:/db
+
+  bot:
+    image: benricheson101/csc-go-laundry-discord
+    build:
+      context: .
+      args:
+        GIT_COMMIT: ${GIT_COMMIT}
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
+    volumes:
+      - ${DATABASE_PATH}:/app/${DATABASE_PATH}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully

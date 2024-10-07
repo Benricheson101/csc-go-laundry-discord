@@ -1,5 +1,4 @@
 import BetterSqlite3 from 'better-sqlite3';
-import {isNumber} from 'node:util';
 
 // TODO: make prepared queries constants?
 
