@@ -180,8 +180,6 @@ export class Database {
       }
     );
 
-    console.log('updating', data);
-
     return updateMany(data);
   }
 

@@ -29,7 +29,6 @@ export class NotificationService {
 
   async run(roomStatuses: AllRoomMachineStatuses) {
     const subscriptions = this.db.getActiveSubscriptions();
-    console.dir(subscriptions, {depth: null});
 
     const {machine, nextAvailable} = subscriptions.reduce(
       (a, c) => {

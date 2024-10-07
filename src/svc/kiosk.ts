@@ -37,10 +37,7 @@ export class KioskService {
         Number(idx)
       );
       if (outdated.length) {
-        console.log('different hashes:', roomStatusesHash, outdated);
         for (const o of outdated) {
-          // FIXME: this doesn't bump the updated at timestamp if there aren't any changes,
-          // should I change it to just say "Updates every x minutes"?
           const updatedMsg = await this.dapi.updateMsg(
             o.channel_id,
             o.message_id,
@@ -49,8 +46,6 @@ export class KioskService {
 
           updated.push([roomStatusesHash, updatedMsg.id, Number(idx)]);
         }
-      } else {
-        console.log('all hashes are the same');
       }
     }
     this.db.updateManyKioskMessageHashes(updated);

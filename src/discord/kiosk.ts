@@ -36,9 +36,8 @@ export const generateKioskMessage = (
       ].join('\n'),
     })),
     footer: {
-      text: `Updates every ${Math.round(Number(process.env.INTERVAL) / 1_000)}s • Last updated`,
+      text: `Updates every ${Math.round(Number(process.env.INTERVAL) / 1_000)}s`,
     },
-    timestamp: new Date().toISOString(),
   };
 
   const add = 3 - (embed.fields!.length % 3);

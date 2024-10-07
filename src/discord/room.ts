@@ -22,8 +22,6 @@ export const generateViewRoomMessage = (
 ): RESTPostAPIChannelMessageJSONBody => {
   const machineCls = CSCGo.groupMachinesByClassification(machines);
 
-  console.log(machineCls);
-
   const mapToNr = (o: RoomMachine[]) =>
     o
       .toSorted((a, b) => a.stickerNumber - b.stickerNumber)

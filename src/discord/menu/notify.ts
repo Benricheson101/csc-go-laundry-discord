@@ -63,8 +63,6 @@ export class NotifyMeSpecificMenu extends SelectMenu {
     const [, , roomID] = ctx.i.data.custom_id.split('_');
     const [type, stickerNumber] = ctx.i.data.values[0].split('_');
 
-    console.log(type, stickerNumber, roomID);
-
     try {
       ctx.db.createMachineSubscription(
         ctx.user.id,
