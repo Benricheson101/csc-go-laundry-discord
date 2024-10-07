@@ -76,6 +76,17 @@ export class Database {
       .all(user) as Subscription[];
   }
 
+  countSubscriptions() {
+    return (
+      this.#db
+        .prepare(`
+        select count(*) c
+        from subscriptions
+      `)
+        .get() as {c: number}
+    ).c;
+  }
+
   createNextAvailableSubscription(
     user: string,
     kind: DBMachineType,
