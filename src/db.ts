@@ -1,4 +1,5 @@
 import BetterSqlite3 from 'better-sqlite3';
+import {isNumber} from 'node:util';
 
 // TODO: make prepared queries constants?
 
@@ -10,6 +11,21 @@ export class Database {
   }
 
   createMachineSubscription(user: string, machineID: number, roomID: string) {
+    if (
+      !(
+        user &&
+        typeof machineID === 'number' &&
+        !Number.isNaN(machineID) &&
+        roomID
+      )
+    ) {
+      throw new DatabaseError('invalid inputs to CreateMachineSubscription', {
+        user,
+        machineID,
+        roomID,
+      });
+    }
+
     return this.#db
       .prepare(`
         insert into subscriptions (type, user_id, machine_id, room_id)
@@ -49,6 +65,27 @@ export class Database {
           and user_id = ?;
       `)
       .all(user) as Subscription[];
+  }
+
+  createNextAvailableSubscription(
+    user: string,
+    kind: DBMachineType,
+    roomID: string
+  ) {
+    if (!(user && [0, 1].includes(kind) && roomID)) {
+      throw new DatabaseError('invalid inputs to CreateMachineSubscription', {
+        user,
+        kind,
+        roomID,
+      });
+    }
+
+    return this.#db
+      .prepare(`
+        insert into subscriptions (type, user_id, machine_type, room_id)
+        values (?, ?, ?, ?);
+      `)
+      .run(SubscriptionType.NextAvailable, user, kind, roomID);
   }
 
   getActiveSubscriptions() {
@@ -160,6 +197,18 @@ export class Database {
       .run(messageID, channelID, guildID);
   }
 
+  hasDMChannelID(userID: string) {
+    return (
+      this.#db
+        .prepare<[string], {has_dm_channel_id: boolean}>(`
+        select dm_channel_id is not null as has_dm_channel_id
+        from discord_users
+        where id = ?
+      `)
+        .get(userID)?.has_dm_channel_id || false
+    );
+  }
+
   setDMChannelID(userID: string, dmChannelID: string) {
     return this.#db
       .prepare(`
@@ -217,4 +266,15 @@ export type KioskMessage = {
 export const DBMachineTypeMap = {
   [DBMachineType.Washer]: 'washer',
   [DBMachineType.Dryer]: 'dryer',
+  washer: DBMachineType.Washer,
+  dryer: DBMachineType.Dryer,
 } as const;
+
+export class DatabaseError extends Error {
+  constructor(
+    msg: string,
+    readonly meta: unknown
+  ) {
+    super(msg);
+  }
+}

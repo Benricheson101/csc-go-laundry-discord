@@ -26,8 +26,6 @@ export const generateKioskMessage = (
     author: {
       name: data.location.label,
     },
-    //fields: Object.entries(data.rooms)
-    //  .toSorted(([a], [b]) => Number(a.split('-')[1]) - Number(b.split('-')[1]))
     fields: data.sortedRooms.map(([room, status]) => ({
       name: toRoomName(rooms[room]!),
       inline: true,
@@ -38,7 +36,7 @@ export const generateKioskMessage = (
       ].join('\n'),
     })),
     footer: {
-      text: 'Last updated',
+      text: `Updates every ${Math.round(Number(process.env.INTERVAL) / 1_000)}s • Last updated`,
     },
     timestamp: new Date().toISOString(),
   };
@@ -70,8 +68,6 @@ export const generateKioskMessage = (
       ],
     },
   ];
-
-  console.log(embed.fields!);
 
   return {embeds: [embed], components};
 };

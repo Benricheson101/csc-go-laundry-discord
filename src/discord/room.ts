@@ -1,10 +1,12 @@
 import {
   ComponentType,
+  MessageFlags,
   type APIActionRowComponent,
   type APIEmbed,
   type APIMessageActionRowComponent,
   type RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10';
+import {capitalize} from '@benricheson101/util';
 
 import {
   CSCGo,
@@ -13,7 +15,6 @@ import {
   type RoomSummary,
 } from '../cscgo';
 import {toRoomName} from '../util/room';
-import {capitalize} from '@benricheson101/util';
 
 export const generateViewRoomMessage = (
   room: RoomSummary,
@@ -29,33 +30,30 @@ export const generateViewRoomMessage = (
       .map(a => `#${a.stickerNumber}`)
       .join(', ');
 
+  const mapMachines = (kind: 'washer' | 'dryer') => {
+    return [
+      `**Available:** ${mapToNr(machineCls.available[kind])}`,
+      `**Finished:** ${mapToNr(machineCls.finished[kind])}`,
+      '**In Use:**',
+      machineCls.inUse[kind]
+        .toSorted((a, b) => a.timeRemaining - b.timeRemaining)
+        .map(
+          m =>
+            `- #${m.stickerNumber} (done <t:${Math.floor(Date.now() / 1_000) + m.timeRemaining * 60}:R>)`
+        )
+        .join('\n'),
+    ];
+  };
+
   const embed: APIEmbed = {
     title: `${toRoomName({label: room.roomLabel, roomId: room.roomId})} Laundry Room`,
     color: 0x54b25d,
     description: [
       '— Washers —',
-      `**Available:** ${mapToNr(machineCls.available.washer)}`,
-      `**Finished:** ${mapToNr(machineCls.finished.washer)}`,
-      '**In Use:**',
-      machineCls.inUse.washer
-        .toSorted((a, b) => a.timeRemaining - b.timeRemaining)
-        .map(
-          m =>
-            `- #${m.stickerNumber} (done <t:${Math.floor(Date.now() / 1_000) + m.timeRemaining * 60}:R>)`
-        )
-        .join('\n'),
+      ...mapMachines('washer'),
 
       '— Dryers —',
-      `**Available:** ${mapToNr(machineCls.available.dryer)}`,
-      `**Finished:** ${mapToNr(machineCls.finished.dryer)}`,
-      '**In Use:**',
-      machineCls.inUse.dryer
-        .toSorted((a, b) => a.timeRemaining - b.timeRemaining)
-        .map(
-          m =>
-            `- #${m.stickerNumber} (done <t:${Math.floor(Date.now() / 1_000) + m.timeRemaining * 60}:R>)`
-        )
-        .join('\n'),
+      ...mapMachines('dryer'),
     ].join('\n'),
   };
   const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [
@@ -64,7 +62,7 @@ export const generateViewRoomMessage = (
       components: [
         {
           type: ComponentType.StringSelect,
-          custom_id: 'notifyblah',
+          custom_id: `notifyme_${room.roomId}`,
           placeholder: 'Notify me...',
           options: [
             {
@@ -91,59 +89,7 @@ export const generateViewRoomMessage = (
     },
   ];
 
-  // const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [
-  //   {
-  //     type: ComponentType.ActionRow,
-  //     components: [
-  //       {
-  //         type: ComponentType.Button,
-  //         style: ButtonStyle.Secondary,
-  //         label: 'Notify me when a specific machine finishes',
-  //         custom_id: `notify_specific_${room.roomId}`,
-  //         emoji: {
-  //           name: String.fromCodePoint(0x1f514),
-  //         },
-  //       },
-  //       // {
-  //       //   type: ComponentType.Button,
-  //       //   style: ButtonStyle.Secondary,
-  //       //   label: 'Notify Me...',
-  //       //   custom_id: `notify_${room.roomId}`,
-  //       // },
-  //     ],
-  //   },
-  //   {
-  //     type: ComponentType.ActionRow,
-  //     components: [
-  //       {
-  //         type: ComponentType.Button,
-  //         style: ButtonStyle.Secondary,
-  //         // label: 'Notify me when the next washer becomes available',
-  //         label: 'Notify me when a washer is available',
-  //         custom_id: `notify_next_washer_${room.roomId}`,
-  //         emoji: {
-  //           name: String.fromCodePoint(0x1f514),
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     type: ComponentType.ActionRow,
-  //     components: [
-  //       {
-  //         type: ComponentType.Button,
-  //         style: ButtonStyle.Secondary,
-  //         label: 'Notify me when a dryer is available',
-  //         custom_id: `notify_next_${room.roomId}`,
-  //         emoji: {
-  //           name: String.fromCodePoint(0x1f514),
-  //         },
-  //       },
-  //     ],
-  //   },
-  // ];
-
-  return {embeds: [embed], components};
+  return {embeds: [embed], components, flags: MessageFlags.Ephemeral};
 };
 
 export const generateNotifyMeMessage = (
@@ -161,13 +107,17 @@ export const generateNotifyMeMessage = (
         {
           type: ComponentType.StringSelect,
           custom_id: `notify_specific_${room.roomId}`,
-          placeholder: 'Which machine would you like to be notified about?',
+          placeholder: inUse.length
+            ? 'Which machine would you like to be notified about?'
+            : 'No machines are currently running!',
           options: inUse.length
-            ? inUse.map(m => ({
-                label: `${capitalize(m.type)} #${m.stickerNumber} (${m.timeRemaining}m remaining)`,
-                value: `notify_specific_${room.roomId}_${m.type}_${m.stickerNumber}`,
-                // emoji // TODO: washer/dryer emoji?
-              }))
+            ? inUse
+                .toSorted((a, b) => a.stickerNumber - b.stickerNumber)
+                .map(m => ({
+                  label: `${capitalize(m.type)} #${m.stickerNumber} (${m.timeRemaining}m remaining)`,
+                  value: `${m.type}_${m.stickerNumber}`,
+                  // emoji // TODO: washer/dryer emoji?
+                }))
             : [{label: 'No Machines Running!', value: 'na'}],
 
           disabled: !inUse.length,
@@ -177,17 +127,34 @@ export const generateNotifyMeMessage = (
   ];
 
   return {
-    content: 'Which machine would you like to subscribe to?',
     components,
+    content: 'Which machine would you like to subscribe to?',
+    flags: MessageFlags.Ephemeral,
+    embeds: [],
   };
 };
 
-export const generateNotifySubscribeSuccessMessage = (
+export const generateNotifySubscribeNextAvailableSuccessMessage = (
+  machineType: MachineType
+): RESTPostAPIChannelMessageJSONBody => ({
+  flags: MessageFlags.Ephemeral,
+  content: [
+    `:white_check_mark: I'll notify you when the next **${machineType}** becomes available!`,
+    '-# Make sure you have your DMs enabled!',
+  ].join('\n'),
+  components: [],
+  embeds: [],
+});
+
+export const generateNotifySubscribeSpecificSuccessMessage = (
   machineNr: number,
   machineType: MachineType
 ): RESTPostAPIChannelMessageJSONBody => ({
+  flags: MessageFlags.Ephemeral,
   content: [
     `:white_check_mark: I'll notify you when **${machineType} #${machineNr}** is finished!`,
     '-# Make sure you have your DMs enabled!',
   ].join('\n'),
+  components: [],
+  embeds: [],
 });

@@ -5,11 +5,17 @@ import {CSCGo} from './cscgo';
 import {DiscordAPI} from './discord/api';
 import {KioskService} from './svc/kiosk';
 import {NotificationService} from './svc/notify';
+import {DiscordService} from './svc/discord';
+import {InfoCommand} from './discord/cmds/info';
+import type {Command, SelectMenu} from './discord/interaction';
+import {KioskRoomSelectMenu} from './discord/menu/kiosk';
+import {NotifyMeSelectMenu, NotifyMeSpecificMenu} from './discord/menu/notify';
 
 // TODO: limit number of kiosk messages per server?
 // TODO: handle deleted kiosk messages
 
 const interval = Number(process.env.INTERVAL) || 60_000;
+process.env.INTERVAL = interval.toString();
 
 const location = process.env.CSCGO_LOCATION!;
 assert(location);
@@ -24,12 +30,26 @@ const main = async () => {
 
   const kioskSvc = new KioskService(db, dapi, cscgo);
   const notifySvc = new NotificationService(db, dapi, cscgo);
+  const discordSvc = new DiscordService(db, dapi, cscgo);
+
+  const commands: Command[] = [InfoCommand].map(C => new C());
+  const selectMenus: SelectMenu[] = [
+    KioskRoomSelectMenu,
+    NotifyMeSelectMenu,
+    NotifyMeSpecificMenu,
+  ].map(S => new S());
+
+  discordSvc.addCommands(commands);
+  discordSvc.addSelectMenus(selectMenus);
+  //console.log(await discordSvc.createDiscordCommands());
 
   const run = async () => {
     const roomStatuses = await cscgo.getAllRoomMachineStatuses();
     kioskSvc.run(roomStatuses);
     notifySvc.run(roomStatuses);
   };
+
+  discordSvc.start();
 
   run();
   setInterval(() => {

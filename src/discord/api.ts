@@ -5,6 +5,7 @@ import type {
   APIMessage,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
+  RESTPutAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
 export class DiscordAPI {
@@ -55,5 +56,20 @@ export class DiscordAPI {
       },
       body: JSON.stringify({recipient_id: userID}),
     }).then(r => r.json() as Promise<APIDMChannel>);
+  }
+
+  async createCommands(cmds: RESTPutAPIApplicationCommandsJSONBody) {
+    const appID = Buffer.from(
+      this.#botToken.split('.')[0],
+      'base64'
+    ).toString();
+    return fetch(`https://discord.com/api/v10/applications/${appID}/commands`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bot ${process.env.DISCORD_TOKEN!}`,
+      },
+      body: JSON.stringify(cmds),
+    });
   }
 }
