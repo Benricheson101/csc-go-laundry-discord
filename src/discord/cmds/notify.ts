@@ -3,7 +3,6 @@ import {
   type APIApplicationCommandInteractionDataStringOption as StringOption,
   type APIChatInputApplicationCommandInteraction,
   ApplicationCommandOptionType,
-  InteractionResponseType,
   MessageFlags,
   type RESTPostAPIApplicationCommandsJSONBody,
   type APIApplicationCommandInteractionDataNumberOption as NumberOption,
@@ -11,14 +10,14 @@ import {
 import {Command} from '../interaction';
 import type {Context} from '../interaction';
 import assert from 'node:assert';
-import {toRoomName} from '../../util/room';
-import {capitalize} from '@benricheson101/util';
 import {
   generateNotifySubscribeNextAvailableSuccessMessage,
   generateNotifySubscribeSpecificSuccessMessage,
 } from '../room';
-import {CSCGo, MachineClassification, type MachineType} from '../../cscgo';
+import type {MachineType} from '../../cscgo';
 import {DBMachineTypeMap} from '../../db';
+import {laundryRoomAutocomplate} from '../autocomplete/laundryRoom';
+import {machineNumberAutocomplete} from '../autocomplete/machineNumber';
 
 // /notify-me clear
 // /notify-me when-machine-finishes
@@ -184,67 +183,11 @@ export class NotifyCommand extends Command {
 
     switch (focused.name) {
       case 'laundry-room': {
-        assert(focused.type === ApplicationCommandOptionType.String);
-        const query = focused.value;
-
-        const location = ctx.cscgo.location;
-        const rooms = location.rooms
-          .map(r => ({name: toRoomName(r), value: r.roomId}))
-          .filter(r => r.name.toLowerCase().includes(query.toLowerCase()))
-          .toSorted((a, b) => (a.name < b.name ? -1 : 1))
-          .slice(0, 25);
-
-        ctx.respond({
-          type: InteractionResponseType.ApplicationCommandAutocompleteResult,
-          data: {
-            choices: rooms,
-          },
-        });
-
-        return;
+        return laundryRoomAutocomplate(ctx);
       }
 
       case 'machine-number': {
-        assert(focused.type === ApplicationCommandOptionType.Number);
-
-        const roomID = ctx.getOption<StringOption | undefined>(
-          'laundry-room'
-        )?.value;
-        const query = focused.value;
-
-        const room = ctx.cscgo.machines;
-
-        if (roomID && roomID in room) {
-          const roomMachines = await ctx.cscgo.getRoomMachines(roomID);
-          const rm = roomMachines.filter(
-            m =>
-              CSCGo.classifyMachine(m) === MachineClassification.InUse &&
-              m.stickerNumber.toString().includes(query.toString())
-          );
-
-          const machines = rm
-            .toSorted((a, b) => a.stickerNumber - b.stickerNumber)
-            .map(m => ({
-              name: `${capitalize(m.type)} #${m.stickerNumber} (${m.timeRemaining}m remaining)`,
-              value: m.stickerNumber,
-            }));
-
-          ctx.respond({
-            type: InteractionResponseType.ApplicationCommandAutocompleteResult,
-            data: {
-              choices: machines,
-            },
-          });
-          return;
-        }
-
-        ctx.respond({
-          type: InteractionResponseType.ApplicationCommandAutocompleteResult,
-          data: {
-            choices: [],
-          },
-        });
-        return;
+        return machineNumberAutocomplete(ctx);
       }
 
       default: {
