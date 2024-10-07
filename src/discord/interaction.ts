@@ -43,16 +43,7 @@ export class Context<T extends APIInteraction> {
       return;
     }
 
-    fetch(
-      `https://discord.com/api/v10/interactions/${this.i.id}/${this.i.token}`,
-      {
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(msg),
-      }
-    );
-    this.hasResponded = true;
+    await this.dapi.respondInteraction(this.i, msg);
   }
 
   async send(msg: APIInteractionResponseCallbackData) {

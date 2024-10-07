@@ -2,6 +2,8 @@
 
 import type {
   APIDMChannel,
+  APIInteraction,
+  APIInteractionResponse,
   APIMessage,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
@@ -71,5 +73,17 @@ export class DiscordAPI {
       },
       body: JSON.stringify(cmds),
     });
+  }
+
+  async respondInteraction(i: APIInteraction, msg: APIInteractionResponse) {
+    return fetch(
+      `https://discord.com/api/v10/interactions/${i.id}/${i.token}`,
+      {
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(msg),
+      }
+    );
   }
 }
