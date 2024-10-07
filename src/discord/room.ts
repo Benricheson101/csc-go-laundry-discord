@@ -106,11 +106,14 @@ export const generateNotifyMeMessage = (
           type: ComponentType.StringSelect,
           custom_id: `notify_specific_${room.roomId}`,
           placeholder: inUse.length
-            ? 'Which machine would you like to be notified about?'
+            ? 'Choose a machine...'
             : 'No machines are currently running!',
           options: inUse.length
             ? inUse
-                .toSorted((a, b) => a.stickerNumber - b.stickerNumber)
+                // TODO: should this use sticker number or time remaining? sticker makes more sense but
+                // the embed uses time remaining so it's weird to have different orders
+                //.toSorted((a, b) => a.stickerNumber - b.stickerNumber)
+                .toSorted((a, b) => a.timeRemaining - b.timeRemaining)
                 .map(m => ({
                   label: `${capitalize(m.type)} #${m.stickerNumber} (${m.timeRemaining}m remaining)`,
                   value: `${m.type}_${m.stickerNumber}`,

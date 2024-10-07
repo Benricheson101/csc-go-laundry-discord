@@ -14,6 +14,12 @@ importers:
       better-sqlite3:
         specifier: ^11.3.0
         version: 11.3.0
+      discord-api-types:
+        specifier: ^0.37.101
+        version: 0.37.101
+      discord-verify:
+        specifier: ^1.2.0
+        version: 1.2.0
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.3
@@ -24,12 +30,6 @@ importers:
       '@types/node':
         specifier: ^22.7.4
         version: 22.7.4
-      discord-api-types:
-        specifier: ^0.37.101
-        version: 0.37.101
-      discord-verify:
-        specifier: ^1.2.0
-        version: 1.2.0
       nodemon:
         specifier: ^3.1.7
         version: 3.1.7
