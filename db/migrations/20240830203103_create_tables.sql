@@ -1,9 +1,14 @@
 -- migrate:up
 
+create table discord_users (
+  id varchar(20) primary key,
+  dm_channel_id varchar(20)
+);
+
 -- discord user subscribing to machine or next available updates
 create table subscriptions (
   id integer primary key,
-  user_id varchar(20) not null,
+  user_id varchar(20) not null references discord_users(id) on delete cascade,
 
   -- type 0: subscribe to individual machine
   -- type 1: subscribe to next-available updates
@@ -43,3 +48,4 @@ drop table kiosk_messages;
 drop index only_one_1_subscription;
 drop index only_one_0_subscription;
 drop table subscriptions;
+drop table discord_users;

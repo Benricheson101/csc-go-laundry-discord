@@ -1,3 +1,5 @@
+import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
+
 import {
   type AllRoomMachineStatuses,
   CSCGo,
@@ -27,6 +29,7 @@ export class NotificationService {
 
   async run(roomStatuses: AllRoomMachineStatuses) {
     const subscriptions = this.db.getActiveSubscriptions();
+    console.dir(subscriptions, {depth: null});
 
     const {machine, nextAvailable} = subscriptions.reduce(
       (a, c) => {
@@ -54,10 +57,10 @@ export class NotificationService {
       return roomMachines;
     };
 
-    const toSend = {
-      [SubscriptionType.Machine]: [] as MachineSubscription[],
-      [SubscriptionType.NextAvailable]: [] as NextAvailableSubscription[],
-    };
+    const toSend: [
+      sub: Subscription,
+      msg: RESTPostAPIChannelMessageJSONBody,
+    ][] = [];
 
     for (const m of machine) {
       const roomMachines = await getRoomMachines(m.room_id);
@@ -73,20 +76,12 @@ export class NotificationService {
           MachineClassification.Finished,
         ].includes(CSCGo.classifyMachine(machine))
       ) {
-        console.log(
-          'MACHINE SUBSCRIPTION:',
-          m.id,
-          machine.stickerNumber,
-          'is now finished'
-        );
+        toSend.push([
+          m,
+          generateMachineNotificationMessage(m, machine, roomStatuses.location),
+        ]);
 
-        toSend[SubscriptionType.Machine].push(m);
-
-        this.dapi.sendMsg(
-          '1292648098996424786',
-          generateMachineNotificationMessage(m, machine, roomStatuses.location)
-        );
-        //this.db.deleteSubscription(m.id);
+        this.db.deleteSubscription(m.id);
       }
     }
 
@@ -96,28 +91,33 @@ export class NotificationService {
           .available;
 
       if (availableMachines.length) {
-        console.log(
-          'NEXT AVAILABLE SUBSCRIPTION:',
-          na.id,
-          DBMachineTypeMap[na.machine_type],
-          'is now available in',
-          na.room_id
-        );
-
-        toSend[SubscriptionType.NextAvailable].push(na);
-
-        this.dapi.sendMsg(
-          '1292648098996424786',
+        toSend.push([
+          na,
           generateNextAvailableNotificationMessage(
             na,
             roomStatuses.rooms[na.room_id]!,
             roomStatuses.location
-          )
-        );
-        //this.db.deleteSubscription(na.id);
+          ),
+        ]);
+
+        this.db.deleteSubscription(na.id);
       }
     }
 
-    console.dir(toSend, {depth: null});
+    console.log('Sending', toSend.length, 'notifications');
+
+    const dmChannelCache = new Map<string, string>();
+    for (const [sub, msg] of toSend) {
+      if (!sub.dm_channel_id && !dmChannelCache.has(sub.user_id)) {
+        const channel = await this.dapi.createDM(sub.user_id);
+        this.db.setDMChannelID(sub.user_id, channel.id);
+        sub.dm_channel_id = channel.id;
+      }
+
+      dmChannelCache.set(sub.user_id, sub.dm_channel_id!);
+
+      const dmChannel = dmChannelCache.get(sub.user_id)!;
+      this.dapi.sendMsg(dmChannel, msg);
+    }
   }
 }

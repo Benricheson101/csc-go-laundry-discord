@@ -54,8 +54,10 @@ export class Database {
   getActiveSubscriptions() {
     return this.#db
       .prepare(`
-      select *
-      from subscriptions
+      select s.*, du.dm_channel_id
+      from subscriptions s
+      inner join discord_users du
+      on s.user_id = du.id
     `)
       .all() as Subscription[];
   }
@@ -133,18 +135,9 @@ export class Database {
   updateManyKioskMessageHashes(
     data: [hash: string, messageID: string, idx: number][]
   ) {
-    //const query = this.#db.prepare(`
-    //  update kiosk_messages
-    //  set last_update_hash = ?
-    //  where
-    //    message_id = ?
-    //    and idx = ?
-    //`);
-
     const updateMany = this.#db.transaction(
       (data: [hash: string, messageID: string, idx: number][]) => {
         for (const d of data) {
-          //query.run(data[idx][0], data[idx][1], idx);
           this.updateKioskMessageHash(...d);
         }
       }
@@ -166,6 +159,16 @@ export class Database {
       `)
       .run(messageID, channelID, guildID);
   }
+
+  setDMChannelID(userID: string, dmChannelID: string) {
+    return this.#db
+      .prepare(`
+        update discord_users
+        set dm_channel_id = ?
+        where id = ?;
+      `)
+      .run(userID, dmChannelID);
+  }
 }
 
 export enum SubscriptionType {
@@ -183,6 +186,7 @@ type MakeSubscription<Type extends SubscriptionType, Data> = {
   id: number;
   user_id: string;
   room_id: string;
+  dm_channel_id?: string;
   type: Type;
 } & Data;
 

@@ -1,6 +1,7 @@
 // TODO: figure out rate limiting
 
 import type {
+  APIDMChannel,
   APIMessage,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
@@ -43,5 +44,16 @@ export class DiscordAPI {
         body: JSON.stringify(msg),
       }
     ).then(r => r.json() as Promise<APIMessage>);
+  }
+
+  async createDM(userID: string) {
+    return fetch('https://discord.com/api/v10/users/@me/channels', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bot ${process.env.DISCORD_TOKEN!}`,
+      },
+      body: JSON.stringify({recipient_id: userID}),
+    }).then(r => r.json() as Promise<APIDMChannel>);
   }
 }
