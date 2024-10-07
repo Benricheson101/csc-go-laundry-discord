@@ -59,7 +59,7 @@ export class NotificationService {
 
     const toSend: [
       sub: Subscription,
-      msg: RESTPostAPIChannelMessageJSONBody,
+      msg: (pretty: boolean) => RESTPostAPIChannelMessageJSONBody,
     ][] = [];
 
     for (const m of machine) {
@@ -107,7 +107,7 @@ export class NotificationService {
     console.log('Sending', toSend.length, 'notifications');
 
     const dmChannelCache = new Map<string, string>();
-    for (const [sub, msg] of toSend) {
+    for (const [sub, buildMsg] of toSend) {
       if (!sub.dm_channel_id && !dmChannelCache.has(sub.user_id)) {
         const channel = await this.dapi.createDM(sub.user_id);
         this.db.setDMChannelID(sub.user_id, channel.id);
@@ -117,7 +117,8 @@ export class NotificationService {
       dmChannelCache.set(sub.user_id, sub.dm_channel_id!);
 
       const dmChannel = dmChannelCache.get(sub.user_id)!;
-      this.dapi.sendMsg(dmChannel, msg);
+      const sentMsg = await this.dapi.sendMsg(dmChannel, buildMsg(false));
+      this.dapi.updateMsg(dmChannel, sentMsg.id, buildMsg(true));
     }
   }
 }
