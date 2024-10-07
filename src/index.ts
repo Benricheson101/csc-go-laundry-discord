@@ -10,6 +10,8 @@ import {InfoCommand} from './discord/cmds/info';
 import type {Command, SelectMenu} from './discord/interaction';
 import {KioskRoomSelectMenu} from './discord/menu/kiosk';
 import {NotifyMeSelectMenu, NotifyMeSpecificMenu} from './discord/menu/notify';
+import {NotifyCommand} from './discord/cmds/notify';
+import {Logger} from './util/logger';
 
 // TODO: limit number of kiosk messages per server?
 // TODO: handle deleted kiosk messages
@@ -24,15 +26,19 @@ const discordToken = process.env.DISCORD_TOKEN;
 assert(discordToken);
 
 const main = async () => {
+  const logger = Logger.withValues({service: 'main'});
+
   const dapi = new DiscordAPI(discordToken);
-  const cscgo = new CSCGo(location);
   const db = new Database('./db/database.sqlite3');
+  const cscgo = new CSCGo(location);
+  await cscgo.populateCache();
 
   const kioskSvc = new KioskService(db, dapi, cscgo);
   const notifySvc = new NotificationService(db, dapi, cscgo);
   const discordSvc = new DiscordService(db, dapi, cscgo);
 
-  const commands: Command[] = [InfoCommand].map(C => new C());
+  const commands: Command[] = [InfoCommand, NotifyCommand].map(C => new C());
+
   const selectMenus: SelectMenu[] = [
     KioskRoomSelectMenu,
     NotifyMeSelectMenu,
@@ -44,7 +50,14 @@ const main = async () => {
   //console.log(await discordSvc.createDiscordCommands());
 
   const run = async () => {
+    const before = Date.now();
     const roomStatuses = await cscgo.getAllRoomMachineStatuses();
+    const after = Date.now();
+
+    logger.verbose('fetched room machine statuses', {
+      time_taken: `${after - before}ms`,
+    });
+
     kioskSvc.run(roomStatuses);
     notifySvc.run(roomStatuses);
   };

@@ -2,7 +2,18 @@ import {Logger} from './util/logger';
 
 // TODO: cache responses for a short time?
 export class CSCGo {
+  /** this shouldn't change so caching for faster responses */
+  location!: LocationSummary;
+
+  /** this shouldn't change so caching for faster responses. don't trust data that can change, though */
+  machines!: {[key: string]: RoomMachine[]};
+
   constructor(private locationID: string) {}
+
+  async populateCache() {
+    this.location = await this.getLocationSummary();
+    this.machines = await this.getAllRoomMachines();
+  }
 
   async getLocationSummary(): Promise<LocationSummary> {
     return fetch(this.#apiURL()).then(
@@ -20,6 +31,17 @@ export class CSCGo {
     return fetch(this.#apiURL(`/room/${roomID}/machines`)).then(
       r => r.json() as Promise<RoomMachine[]>
     );
+  }
+
+  async getAllRoomMachines() {
+    const location = await this.getLocationSummary();
+    const roomMachines = await Promise.all(
+      location.rooms
+        .filter(r => r.connected)
+        .map(async r => [r.roomId, await this.getRoomMachines(r.roomId)])
+    );
+
+    return Object.fromEntries(roomMachines);
   }
 
   async getAllRoomMachineStatuses() {

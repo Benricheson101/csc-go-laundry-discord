@@ -14,6 +14,7 @@ import {
   type APIApplicationCommandInteraction,
   type APIMessageComponentSelectMenuInteraction,
   type APIMessageComponentButtonInteraction,
+  APIApplicationCommandAutocompleteInteraction,
 } from 'discord-api-types/v10';
 import {verify} from 'discord-verify';
 
@@ -123,6 +124,11 @@ export class DiscordService {
         break;
       }
 
+      case InteractionType.ApplicationCommandAutocomplete: {
+        await this.handleAutocomplete(i, res);
+        break;
+      }
+
       case InteractionType.MessageComponent: {
         switch (true) {
           case isMessageComponentSelectMenuInteraction(i): {
@@ -154,7 +160,7 @@ export class DiscordService {
       this.db,
       this.dapi,
       this.cscgo,
-      Logger.withValues({cmd_name: i.data.name}, this.logger)
+      Logger.withValues({cmd_name: i.data.name, kind: 'command'}, this.logger)
     );
 
     ctx.logger.info('', {
@@ -259,7 +265,41 @@ export class DiscordService {
     }
   }
 
-  async handleAutocomplete() {}
+  async handleAutocomplete(
+    i: APIApplicationCommandAutocompleteInteraction,
+    res: ServerResponse
+  ) {
+    const cmd = this.cmds.get(i.data.name);
+    const ctx = new Context(
+      i,
+      res,
+      this.db,
+      this.dapi,
+      this.cscgo,
+      Logger.withValues(
+        {cmd_name: i.data.name, kind: 'autocomplete'},
+        this.logger
+      )
+    );
+
+    ctx.logger.info('', {
+      user_id: ctx.user.id,
+      guild_id: i.guild_id,
+      channel_id: i.channel?.id,
+      focused: '??',
+    });
+
+    try {
+      await cmd?.autocomplete(ctx);
+    } catch (err) {
+      this.logger.error('error running autocomplete', {
+        cmd: i.data.name,
+        err,
+        user_id: ctx.user.id,
+      });
+      return;
+    }
+  }
 
   async createDiscordCommands() {
     return this.dapi.createCommands([...this.cmds.values().map(c => c.meta)]);

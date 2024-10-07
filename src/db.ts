@@ -43,6 +43,15 @@ export class Database {
       .run(id);
   }
 
+  deleteUserSubscriptions(userID: string) {
+    return this.#db
+      .prepare(`
+        delete from subscriptions
+        where user_id = ?
+      `)
+      .run(userID);
+  }
+
   getMachineSubscriptionsForMachine(machineID: number): Subscription[] {
     return this.#db
       .prepare(`
