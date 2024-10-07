@@ -4,5 +4,6 @@ declare namespace NodeJS {
     CSCGO_LOCATION: string;
     PORT: string;
     INTERVAL: string;
+    LOG_LEVEL: 'verbose' | 'debug' | 'info' | 'warn' | 'error';
   }
 }

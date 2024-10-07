@@ -12,9 +12,8 @@ import {
   InteractionType,
   type APIInteraction,
   type APIApplicationCommandInteraction,
-  APIMessageComponentSelectMenuInteraction,
-  ComponentType,
-  APIMessageComponentButtonInteraction,
+  type APIMessageComponentSelectMenuInteraction,
+  type APIMessageComponentButtonInteraction,
 } from 'discord-api-types/v10';
 import {verify} from 'discord-verify';
 
@@ -31,12 +30,14 @@ import {
   isMessageComponentButtonInteraction,
   isMessageComponentSelectMenuInteraction,
 } from 'discord-api-types/utils/v10';
+import {Logger} from '../util/logger';
 
 export class DiscordService {
   private server: Server;
   private cmds = new Map<string, Command>();
   private buttons = new Map<string | RegExp, Button>();
   private select = new Map<string | RegExp, SelectMenu>();
+  private logger = Logger.withValues({service: 'discord'});
 
   constructor(
     private db: Database,
@@ -73,7 +74,9 @@ export class DiscordService {
     this.server.listen(
       {host: '0.0.0.0', port: Number(process.env.PORT)},
       () => {
-        console.log(`Server listening on http://0.0.0.0:${process.env.PORT}`);
+        this.logger.info('started server', {
+          url: `http://0.0.0.0:${process.env.PORT}`,
+        });
       }
     );
   }
@@ -109,7 +112,6 @@ export class DiscordService {
     }
 
     const i = JSON.parse(body) as APIInteraction;
-    console.dir(i, {depth: null});
 
     switch (i.type) {
       case InteractionType.Ping: {
@@ -146,12 +148,29 @@ export class DiscordService {
     res: ServerResponse
   ): Promise<APIInteractionResponse | undefined> {
     const cmd = this.cmds.get(i.data.name);
-    const ctx = new Context(i, res, this.db, this.dapi, this.cscgo);
+    const ctx = new Context(
+      i,
+      res,
+      this.db,
+      this.dapi,
+      this.cscgo,
+      Logger.withValues({cmd_name: i.data.name}, this.logger)
+    );
+
+    ctx.logger.info('', {
+      user_id: ctx.user.id,
+      guild_id: i.guild_id,
+      channel_id: i.channel?.id,
+    });
 
     try {
       await cmd?.run(ctx);
     } catch (err) {
-      console.error(`Error running command ${i.data.name}:`, err);
+      this.logger.error('error running command', {
+        cmd: i.data.name,
+        err,
+        user_id: ctx.user.id,
+      });
       return;
     }
   }
@@ -167,12 +186,33 @@ export class DiscordService {
           ? i.data.custom_id.startsWith(e)
           : e.test(i.data.custom_id)
       );
-    const ctx = new Context(i, res, this.db, this.dapi, this.cscgo);
+    const ctx = new Context(
+      i,
+      res,
+      this.db,
+      this.dapi,
+      this.cscgo,
+      Logger.withValues({
+        kind: 'select',
+        matches: menu?.[0],
+        custom_id: i.data.custom_id,
+      })
+    );
+
+    ctx.logger.info('', {
+      user_id: ctx.user.id,
+      guild_id: i.guild_id,
+      channel_id: i.channel?.id,
+    });
 
     try {
       await menu?.[1].run(ctx);
     } catch (err) {
-      console.error(`Error running select menu ${i.data.custom_id}:`, err);
+      this.logger.error('error running select', {
+        cmd: i.data.custom_id,
+        err,
+        user_id: ctx.user.id,
+      });
       return;
     }
   }
@@ -188,12 +228,33 @@ export class DiscordService {
           ? i.data.custom_id.startsWith(e)
           : e.test(i.data.custom_id)
       );
-    const ctx = new Context(i, res, this.db, this.dapi, this.cscgo);
+    const ctx = new Context(
+      i,
+      res,
+      this.db,
+      this.dapi,
+      this.cscgo,
+      Logger.withValues({
+        kind: 'button',
+        matches: button?.[0],
+        custom_id: i.data.custom_id,
+      })
+    );
+
+    ctx.logger.info('', {
+      user_id: ctx.user.id,
+      guild_id: i.guild_id,
+      channel_id: i.channel?.id,
+    });
 
     try {
       await button?.[1].run(ctx);
     } catch (err) {
-      console.error(`Error running select menu ${i.data.custom_id}:`, err);
+      this.logger.error('error running button', {
+        cmd: i.data.custom_id,
+        err,
+        user_id: ctx.user.id,
+      });
       return;
     }
   }

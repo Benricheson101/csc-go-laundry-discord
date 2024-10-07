@@ -1,3 +1,5 @@
+import {Logger} from './util/logger';
+
 // TODO: cache responses for a short time?
 export class CSCGo {
   constructor(private locationID: string) {}
@@ -85,7 +87,13 @@ export class CSCGo {
       }
 
       default: {
-        console.error('weird state', machine);
+        Logger.withValues({class: 'CSCGo'}).warn('weird state', {
+          available: machine.available,
+          mode: machine.mode,
+          time_remaining: machine.timeRemaining,
+          machine_id: machine.stickerNumber,
+          room_id: machine.roomId,
+        });
         return MachineClassification.Unknown;
       }
     }

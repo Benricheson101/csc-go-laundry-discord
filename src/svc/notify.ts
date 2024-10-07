@@ -19,8 +19,11 @@ import {
   generateMachineNotificationMessage,
   generateNextAvailableNotificationMessage,
 } from '../discord/notify';
+import {Logger} from '../util/logger';
 
 export class NotificationService {
+  private logger = Logger.withValues({service: 'notify'});
+
   constructor(
     private db: Database,
     private dapi: DiscordAPI,
@@ -65,7 +68,12 @@ export class NotificationService {
       const roomMachines = await getRoomMachines(m.room_id);
       const machine = roomMachines.find(r => r.stickerNumber === m.machine_id)!;
       if (!machine) {
-        console.error("can't find machine for subscription:", m);
+        this.logger.warn("can't find machine for subscription", {
+          subscription_id: m.id,
+          room_id: m.room_id,
+          machine_id: m.machine_id,
+          user_id: m.user_id,
+        });
         continue;
       }
 
@@ -103,7 +111,11 @@ export class NotificationService {
       }
     }
 
-    console.log('Sending', toSend.length, 'notifications');
+    if (toSend.length) {
+      this.logger.info('sending notifications', {n: toSend.length});
+    } else {
+      this.logger.verbose('no notifications to send');
+    }
 
     const dmChannelCache = new Map<string, string>();
     for (const [sub, buildMsg] of toSend) {

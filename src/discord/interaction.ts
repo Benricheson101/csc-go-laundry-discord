@@ -5,6 +5,7 @@ import {
   type APIInteractionResponse,
   type APIInteractionResponseCallbackData,
   type APIMessageComponentButtonInteraction,
+  type APIMessageComponentInteraction,
   type APIMessageComponentSelectMenuInteraction,
   type APIUser,
   InteractionResponseType,
@@ -14,6 +15,7 @@ import {
 import type {Database} from '../db';
 import type {CSCGo} from '../cscgo';
 import type {DiscordAPI} from './api';
+import type {Logger} from '../util/logger';
 
 export class Context<T extends APIInteraction> {
   hasResponded = false;
@@ -23,7 +25,8 @@ export class Context<T extends APIInteraction> {
     readonly res: ServerResponse,
     readonly db: Database,
     readonly dapi: DiscordAPI,
-    readonly cscgo: CSCGo
+    readonly cscgo: CSCGo,
+    readonly logger: Logger
   ) {}
 
   get user(): APIUser {
@@ -77,18 +80,14 @@ export abstract class Command {
   ): Promise<unknown>;
 }
 
-export abstract class SelectMenu {
+abstract class MessageComponentHandler<
+  T extends APIMessageComponentInteraction,
+> {
   abstract matches: string | RegExp;
 
-  abstract run(
-    ctx: Context<APIMessageComponentSelectMenuInteraction>
-  ): Promise<unknown>;
+  abstract run(ctx: Context<T>): Promise<unknown>;
 }
 
-export abstract class Button {
-  abstract matches: string | RegExp;
+export abstract class SelectMenu extends MessageComponentHandler<APIMessageComponentSelectMenuInteraction> {}
 
-  abstract run(
-    ctx: Context<APIMessageComponentButtonInteraction>
-  ): Promise<unknown>;
-}
+export abstract class Button extends MessageComponentHandler<APIMessageComponentButtonInteraction> {}
