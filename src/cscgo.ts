@@ -8,6 +8,8 @@ export class CSCGo {
   /** this shouldn't change so caching for faster responses. don't trust data that can change, though */
   machines!: {[key: string]: RoomMachine[]};
 
+  lastAllRoomMachineStatuses?: AllRoomMachineStatuses;
+
   constructor(private locationID: string) {}
 
   async populateCache() {
@@ -84,7 +86,9 @@ export class CSCGo {
       ([a], [b]) => Number(a.split('-')[1]) - Number(b.split('-')[1])
     );
 
-    return {location, rooms: agg, sortedRooms};
+    const result = {location, rooms: agg, sortedRooms};
+    this.lastAllRoomMachineStatuses = result;
+    return result;
   }
 
   roomLink(roomID: string) {

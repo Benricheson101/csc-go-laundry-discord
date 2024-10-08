@@ -25,6 +25,8 @@ export class Database {
       });
     }
 
+    this.createDiscordUser(user);
+
     return this.#db
       .prepare(`
         insert into subscriptions (type, user_id, machine_id, room_id)
@@ -99,6 +101,8 @@ export class Database {
       });
     }
 
+    this.createDiscordUser(user);
+
     return this.#db
       .prepare(`
         insert into subscriptions (type, user_id, machine_type, room_id)
@@ -121,16 +125,16 @@ export class Database {
   createKioskMessage(
     messageID: string,
     channelID: string,
-    // guildID: string,
+    guildID: string,
     hash: string,
     idx: number
   ) {
     return this.#db
       .prepare(`
-        insert into kiosk_messages(message_id, channel_id, last_update_hash, idx)
-        values (?, ?, ?, ?);
+        insert into kiosk_messages(message_id, channel_id, guild_id, last_update_hash, idx)
+        values (?, ?, ?, ?, ?);
       `)
-      .run(messageID, channelID, hash, idx);
+      .run(messageID, channelID, guildID, hash, idx);
   }
 
   getKioskMessage(messageID: string, channelID: string) {
@@ -143,6 +147,18 @@ export class Database {
           and channel_id = ?;
       `)
       .get(messageID, channelID) as KioskMessage | null;
+  }
+
+  hasKioskMessages(channelID: string) {
+    return !!(
+      this.#db
+        .prepare(`
+        select 1 c
+        from kiosk_messages
+        where channel_id = ?;
+      `)
+        .get(channelID) as {c: 1}
+    )?.c;
   }
 
   getOutdatedKioskMessage(hash: string, idx: number) {
@@ -164,7 +180,8 @@ export class Database {
       )
       select
         tbl.idx,
-        km.channel_id
+        km.channel_id,
+        km.guild_id
       from kiosk_messages km, tbl
       where
         tbl.idx not in (
@@ -173,7 +190,7 @@ export class Database {
           where km2.channel_id = km.channel_id
         );
     `)
-      .all() as {idx: number; channel_id: string}[];
+      .all() as {idx: number; channel_id: string; guild_id: string}[];
   }
 
   updateKioskMessageHash(hash: string, messageID: string, idx: number) {
@@ -202,16 +219,14 @@ export class Database {
     return updateMany(data);
   }
 
-  deleteKioskMessage(messageID: string, channelID: string, guildID: string) {
+  deleteAllKioskMessages(guildID: string) {
     return this.#db
       .prepare(`
         delete from kiosk_messages
         where
-          message_id = ?
-          and channel_id = ?
-          and guild_id = ?;
+          guild_id = ?;
       `)
-      .run(messageID, channelID, guildID);
+      .run(guildID);
   }
 
   hasDMChannelID(userID: string) {
@@ -234,6 +249,17 @@ export class Database {
         where id = ?;
       `)
       .run(userID, dmChannelID);
+  }
+
+  createDiscordUser(userID: string) {
+    return this.#db
+      .prepare(`
+        insert into discord_users (id)
+        values (?)
+        on conflict
+        do nothing
+      `)
+      .run(userID);
   }
 }
 

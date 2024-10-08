@@ -76,7 +76,6 @@ export class NotifyMeSpecificMenu extends SelectMenu {
     } catch (err) {
       if (err instanceof SqliteError) {
         if (err.code !== 'SQLITE_CONSTRAINT_UNIQUE') {
-          //console.error(err);
           ctx.send({
             content: ':x: An error occurred.',
             flags: MessageFlags.Ephemeral,

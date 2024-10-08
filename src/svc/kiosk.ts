@@ -6,6 +6,7 @@ import type {DiscordAPI} from '../discord/api';
 import {generateKioskMessage} from '../discord/kiosk';
 import {hashRooms} from '../util/room';
 import {Logger} from '../util/logger';
+import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
 
 const MAX_ROOMS_PER_KIOSK = 24; // multiple of 3
 
@@ -62,9 +63,19 @@ export class KioskService {
     const missingKioskMessages = this.db.getMissingKioskMessages(
       roomStatusChunks.length
     );
-    for (const {idx, channel_id: channelID} of missingKioskMessages) {
+    for (const {
+      idx,
+      channel_id: channelID,
+      guild_id: guildID,
+    } of missingKioskMessages) {
       const sent = await this.dapi.sendMsg(channelID, msgContents[idx]);
-      this.db.createKioskMessage(sent.id, channelID, hashes[idx], Number(idx));
+      this.db.createKioskMessage(
+        sent.id,
+        channelID,
+        guildID,
+        hashes[idx],
+        Number(idx)
+      );
     }
     if (missingKioskMessages.length) {
       this.logger.info('posted missing kiosk messages', {
@@ -73,5 +84,23 @@ export class KioskService {
     } else {
       this.logger.verbose('no missing kiosk messages');
     }
+  }
+
+  static generateKioskMessages(
+    roomStatuses: AllRoomMachineStatuses
+  ): readonly [RESTPostAPIChannelMessageJSONBody[], string[]] {
+    const roomStatusChunks: AllRoomMachineStatuses[] = chunk(
+      roomStatuses.sortedRooms,
+      MAX_ROOMS_PER_KIOSK
+    ).map(r => ({
+      location: roomStatuses.location,
+      rooms: Object.fromEntries(r),
+      sortedRooms: r,
+    }));
+
+    return [
+      roomStatusChunks.map(c => generateKioskMessage(c)),
+      roomStatusChunks.map(r => hashRooms(r.sortedRooms)),
+    ];
   }
 }

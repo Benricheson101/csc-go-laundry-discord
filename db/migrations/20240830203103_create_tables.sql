@@ -33,6 +33,7 @@ create table kiosk_messages (
   id integer primary key,
   message_id varchar(20) not null,
   channel_id varchar(20) not null,
+  guild_id varchar(20) not null,
   idx integer not null,
 
   last_update_hash char(40),

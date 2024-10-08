@@ -13,6 +13,7 @@ import {NotifyMeSelectMenu, NotifyMeSpecificMenu} from './discord/menu/notify';
 import {NotifyCommand} from './discord/cmds/notify';
 import {Logger} from './util/logger';
 import {RoomCommand} from './discord/cmds/room';
+import {KioskCommand} from './discord/cmds/kiosk';
 
 // TODO: limit number of kiosk messages per server?
 // TODO: handle deleted kiosk messages
@@ -40,9 +41,12 @@ const main = async () => {
   const notifySvc = new NotificationService(db, dapi, cscgo);
   const discordSvc = new DiscordService(db, dapi, cscgo);
 
-  const commands: Command[] = [InfoCommand, NotifyCommand, RoomCommand].map(
-    C => new C()
-  );
+  const commands: Command[] = [
+    InfoCommand,
+    NotifyCommand,
+    RoomCommand,
+    KioskCommand,
+  ].map(C => new C());
 
   const selectMenus: SelectMenu[] = [
     KioskRoomSelectMenu,

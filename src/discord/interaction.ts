@@ -61,10 +61,16 @@ export class Context<T extends APIInteraction> {
   }
 
   async update(msg: APIInteractionResponseCallbackData) {
-    return this.respond({
-      type: InteractionResponseType.UpdateMessage,
-      data: msg,
-    });
+    if (!this.hasResponded) {
+      return this.respond({
+        type: InteractionResponseType.UpdateMessage,
+        data: msg,
+      });
+    }
+
+    console.log('responding original');
+
+    return console.log(await this.dapi.editOriginal(this.i, msg));
   }
 
   getOptions() {

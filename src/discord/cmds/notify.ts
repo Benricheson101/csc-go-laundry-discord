@@ -156,6 +156,7 @@ export class NotifyCommand extends Command {
           return;
         }
 
+        ctx.db.createDiscordUser;
         ctx.db.createNextAvailableSubscription(
           ctx.user.id,
           DBMachineTypeMap[kind],

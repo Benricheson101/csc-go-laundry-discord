@@ -86,4 +86,20 @@ export class DiscordAPI {
       }
     );
   }
+
+  async editOriginal(
+    i: APIInteraction,
+    msg: RESTPatchAPIChannelMessageJSONBody
+  ) {
+    return fetch(
+      `https://discord.com/api/v10/webhooks/${i.application_id}/${i.token}/messages/@original`,
+      {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(msg),
+      }
+    );
+  }
 }
