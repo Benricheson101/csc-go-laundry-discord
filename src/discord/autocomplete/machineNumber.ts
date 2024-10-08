@@ -1,14 +1,14 @@
 import assert from 'node:assert';
 import {
   type APIApplicationCommandAutocompleteInteraction,
-  type APIApplicationCommandInteractionDataStringOption as StringOption,
   ApplicationCommandOptionType,
   InteractionResponseType,
+  type APIApplicationCommandInteractionDataStringOption as StringOption,
 } from 'discord-api-types/v10';
 
-import type {Context} from '../interaction';
-import {CSCGo, MachineClassification} from '../../cscgo';
 import {capitalize} from '@benricheson101/util';
+import {CSCGo, MachineClassification} from '../../cscgo';
+import type {Context} from '../interaction';
 
 export const machineNumberAutocomplete = async (
   ctx: Context<APIApplicationCommandAutocompleteInteraction>

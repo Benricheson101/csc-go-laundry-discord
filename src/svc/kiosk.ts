@@ -1,12 +1,12 @@
 import {chunk} from '@benricheson101/util';
 
+import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
 import type {AllRoomMachineStatuses, CSCGo} from '../cscgo';
 import type {Database} from '../db';
 import type {DiscordAPI} from '../discord/api';
 import {generateKioskMessage} from '../discord/kiosk';
-import {hashRooms} from '../util/room';
 import {Logger} from '../util/logger';
-import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
+import {hashRooms} from '../util/room';
 
 const MAX_ROOMS_PER_KIOSK = 24; // multiple of 3
 

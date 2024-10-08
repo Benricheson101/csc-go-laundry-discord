@@ -7,8 +7,8 @@ import {
   type RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
-import {Command, type Context} from '../interaction';
 import {KioskService} from '../../svc/kiosk';
+import {Command, type Context} from '../interaction';
 
 export class KioskCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {

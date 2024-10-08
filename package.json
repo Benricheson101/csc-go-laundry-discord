@@ -4,7 +4,7 @@
   "description": "",
   "main": "./build/src/index.js",
   "scripts": {
-    "fmt": "biome format --write .",
+    "fmt": "biome check --write .",
     "lint": "biome lint .",
     "dev": "nodemon"
   },

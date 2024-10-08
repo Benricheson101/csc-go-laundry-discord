@@ -1,12 +1,12 @@
-import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
 import {capitalize} from '@benricheson101/util';
+import type {RESTPostAPIChannelMessageJSONBody} from 'discord-api-types/v10';
 
+import type {LocationSummary, RoomMachine, RoomMachineStatuses} from '../cscgo';
 import {
   DBMachineTypeMap,
   type MachineSubscription,
   type NextAvailableSubscription,
 } from '../db';
-import type {LocationSummary, RoomMachine, RoomMachineStatuses} from '../cscgo';
 import {toRoomName} from '../util/room';
 
 const BELL_EMOJI = '\u{1F514}';

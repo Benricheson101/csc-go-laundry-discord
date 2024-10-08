@@ -1,19 +1,18 @@
 import assert from 'node:assert';
-
-import {Database} from './db';
 import {CSCGo} from './cscgo';
+import {Database} from './db';
 import {DiscordAPI} from './discord/api';
-import {KioskService} from './svc/kiosk';
-import {NotificationService} from './svc/notify';
-import {DiscordService} from './svc/discord';
 import {InfoCommand} from './discord/cmds/info';
+import {KioskCommand} from './discord/cmds/kiosk';
+import {NotifyCommand} from './discord/cmds/notify';
+import {RoomCommand} from './discord/cmds/room';
 import type {Command, SelectMenu} from './discord/interaction';
 import {KioskRoomSelectMenu} from './discord/menu/kiosk';
 import {NotifyMeSelectMenu, NotifyMeSpecificMenu} from './discord/menu/notify';
-import {NotifyCommand} from './discord/cmds/notify';
+import {DiscordService} from './svc/discord';
+import {KioskService} from './svc/kiosk';
+import {NotificationService} from './svc/notify';
 import {Logger} from './util/logger';
-import {RoomCommand} from './discord/cmds/room';
-import {KioskCommand} from './discord/cmds/kiosk';
 
 // TODO: limit number of kiosk messages per server?
 // TODO: handle deleted kiosk messages

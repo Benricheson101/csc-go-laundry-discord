@@ -8,11 +8,11 @@ import {
 } from '../cscgo';
 import {
   DBMachineTypeMap,
-  type NextAvailableSubscription,
-  type MachineSubscription,
-  SubscriptionType,
   type Database,
+  type MachineSubscription,
+  type NextAvailableSubscription,
   type Subscription,
+  SubscriptionType,
 } from '../db';
 import type {DiscordAPI} from '../discord/api';
 import {

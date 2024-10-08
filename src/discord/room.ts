@@ -1,12 +1,12 @@
+import {capitalize} from '@benricheson101/util';
 import {
-  ComponentType,
-  MessageFlags,
   type APIActionRowComponent,
   type APIEmbed,
   type APIMessageActionRowComponent,
+  ComponentType,
+  MessageFlags,
   type RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10';
-import {capitalize} from '@benricheson101/util';
 
 import {
   CSCGo,

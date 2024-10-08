@@ -1,36 +1,36 @@
 import {subtle} from 'node:crypto';
 import {
-  createServer,
-  type Server,
   type IncomingMessage,
+  type Server,
   type ServerResponse,
+  createServer,
 } from 'node:http';
 
 import {
+  type APIApplicationCommandAutocompleteInteraction,
+  type APIApplicationCommandInteraction,
+  type APIInteraction,
   type APIInteractionResponse,
+  type APIMessageComponentButtonInteraction,
+  type APIMessageComponentSelectMenuInteraction,
   InteractionResponseType,
   InteractionType,
-  type APIInteraction,
-  type APIApplicationCommandInteraction,
-  type APIMessageComponentSelectMenuInteraction,
-  type APIMessageComponentButtonInteraction,
-  APIApplicationCommandAutocompleteInteraction,
 } from 'discord-api-types/v10';
 import {verify} from 'discord-verify';
 
+import {
+  isMessageComponentButtonInteraction,
+  isMessageComponentSelectMenuInteraction,
+} from 'discord-api-types/utils/v10';
 import type {CSCGo} from '../cscgo';
 import type {Database} from '../db';
 import type {DiscordAPI} from '../discord/api';
 import {
   type Button,
+  type Command,
   Context,
   type SelectMenu,
-  type Command,
 } from '../discord/interaction';
-import {
-  isMessageComponentButtonInteraction,
-  isMessageComponentSelectMenuInteraction,
-} from 'discord-api-types/utils/v10';
 import {Logger} from '../util/logger';
 
 export class DiscordService {

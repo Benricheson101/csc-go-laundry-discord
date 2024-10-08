@@ -1,9 +1,8 @@
 import type {ServerResponse} from 'node:http';
 import {
-  APIApplicationCommandAutocompleteInteraction,
+  type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteraction,
-  APIApplicationCommandInteractionDataOption,
-  APIApplicationCommandOption,
+  type APIApplicationCommandInteractionDataOption,
   type APIInteraction,
   type APIInteractionResponse,
   type APIInteractionResponseCallbackData,
@@ -18,11 +17,11 @@ import {
   type RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
-import type {Database} from '../db';
-import type {CSCGo} from '../cscgo';
-import type {DiscordAPI} from './api';
-import type {Logger} from '../util/logger';
 import assert from 'node:assert';
+import type {CSCGo} from '../cscgo';
+import type {Database} from '../db';
+import type {Logger} from '../util/logger';
+import type {DiscordAPI} from './api';
 
 export class Context<T extends APIInteraction> {
   hasResponded = false;
@@ -68,9 +67,7 @@ export class Context<T extends APIInteraction> {
       });
     }
 
-    console.log('responding original');
-
-    return console.log(await this.dapi.editOriginal(this.i, msg));
+    return this.dapi.editOriginal(this.i, msg);
   }
 
   getOptions() {

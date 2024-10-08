@@ -1,23 +1,23 @@
+import assert from 'node:assert';
 import {
   type APIApplicationCommandAutocompleteInteraction,
-  type APIApplicationCommandInteractionDataStringOption as StringOption,
   type APIChatInputApplicationCommandInteraction,
   ApplicationCommandOptionType,
   MessageFlags,
-  type RESTPostAPIApplicationCommandsJSONBody,
   type APIApplicationCommandInteractionDataNumberOption as NumberOption,
+  type RESTPostAPIApplicationCommandsJSONBody,
+  type APIApplicationCommandInteractionDataStringOption as StringOption,
 } from 'discord-api-types/v10';
-import {Command} from '../interaction';
-import type {Context} from '../interaction';
-import assert from 'node:assert';
-import {
-  generateNotifySubscribeNextAvailableSuccessMessage,
-  generateNotifySubscribeSpecificSuccessMessage,
-} from '../room';
 import type {MachineType} from '../../cscgo';
 import {DBMachineTypeMap} from '../../db';
 import {laundryRoomAutocomplate} from '../autocomplete/laundryRoom';
 import {machineNumberAutocomplete} from '../autocomplete/machineNumber';
+import {Command} from '../interaction';
+import type {Context} from '../interaction';
+import {
+  generateNotifySubscribeNextAvailableSuccessMessage,
+  generateNotifySubscribeSpecificSuccessMessage,
+} from '../room';
 
 // /notify-me clear
 // /notify-me when-machine-finishes

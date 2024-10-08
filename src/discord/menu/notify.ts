@@ -1,17 +1,17 @@
-import {
-  MessageFlags,
-  type APIMessageComponentSelectMenuInteraction,
-} from 'discord-api-types/v10';
 import {SqliteError} from 'better-sqlite3';
+import {
+  type APIMessageComponentSelectMenuInteraction,
+  MessageFlags,
+} from 'discord-api-types/v10';
 
+import type {MachineType} from '../../cscgo';
+import {DBMachineTypeMap} from '../../db';
 import {type Context, SelectMenu} from '../interaction';
 import {
   generateNotifyMeMessage,
   generateNotifySubscribeNextAvailableSuccessMessage,
   generateNotifySubscribeSpecificSuccessMessage,
 } from '../room';
-import {DBMachineTypeMap} from '../../db';
-import type {MachineType} from '../../cscgo';
 
 export class NotifyMeSelectMenu extends SelectMenu {
   matches = 'notifyme';

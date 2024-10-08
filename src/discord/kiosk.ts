@@ -1,8 +1,8 @@
 import {
-  ComponentType,
   type APIActionRowComponent,
   type APIEmbed,
   type APIMessageActionRowComponent,
+  ComponentType,
   type RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10';
 

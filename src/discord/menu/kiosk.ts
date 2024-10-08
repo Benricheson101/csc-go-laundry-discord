@@ -1,6 +1,6 @@
 import {
-  MessageFlags,
   type APIMessageComponentSelectMenuInteraction,
+  MessageFlags,
 } from 'discord-api-types/v10';
 import {type Context, SelectMenu} from '../interaction';
 import {generateViewRoomMessage} from '../room';

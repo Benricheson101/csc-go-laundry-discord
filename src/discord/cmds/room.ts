@@ -1,13 +1,13 @@
 import {
-  ApplicationCommandOptionType,
   type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteraction,
-  type APIApplicationCommandInteractionDataStringOption as StringOption,
-  type RESTPostAPIApplicationCommandsJSONBody,
+  ApplicationCommandOptionType,
   MessageFlags,
+  type RESTPostAPIApplicationCommandsJSONBody,
+  type APIApplicationCommandInteractionDataStringOption as StringOption,
 } from 'discord-api-types/v10';
-import {Command, type Context} from '../interaction';
 import {laundryRoomAutocomplate} from '../autocomplete/laundryRoom';
+import {Command, type Context} from '../interaction';
 import {generateViewRoomMessage} from '../room';
 
 export class RoomCommand extends Command {
