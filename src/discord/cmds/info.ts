@@ -1,6 +1,6 @@
 import {
-    MessageFlags,
   type APIApplicationCommandInteraction,
+  MessageFlags,
   type RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
