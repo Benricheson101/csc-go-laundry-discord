@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+
 import {CSCGo} from './cscgo';
 import {Database} from './db';
 import {DiscordAPI} from './discord/api';
