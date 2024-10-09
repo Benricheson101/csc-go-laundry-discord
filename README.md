@@ -10,18 +10,21 @@ A live feed of a CSCGo campus laundry system in Discord! Featuring:
 
 <details open>
     <summary>Live status of all laundry rooms on campus</summary>
-    ![kiosk](/screenshots/kiosk.png)
+
+![kiosk](/screenshots/kiosk.png)
 </details>
 
 <details open>
     <summary>Current view of a laundry room</summary>
-    ![room view](/screenshots/view-room.png)
+
+![room view](/screenshots/view-room.png)
 </details>
 
 <details open>
     <summary>Interactive menus for creating notifications</summary>
-    ![notify](/screenshots/notify.png)
-    ![notifications](/screenshots/notification.png)
+
+![notify](/screenshots/notify.png)
+![notifications](/screenshots/notification.png)
 </details>
 
 ## Installing
