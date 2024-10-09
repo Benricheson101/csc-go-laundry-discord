@@ -10,11 +10,11 @@ declare namespace NodeJS {
     PORT: string;
     /** interval to poll for updates (seconds) default: 60 */
     INTERVAL?: string;
-    /** location for sqlite3 database. default: ./db/database.db */
-    DATABASE_PATH?: string;
     /** default: info */
     LOG_LEVEL?: 'verbose' | 'info' | 'warn' | 'error';
 
+    /** location for sqlite3 database. leave empty if using docker. default: ./db/database.db */
+    DATABASE_PATH?: string;
     /** (optional): git commit to show in /info command. automatically set when using Docker image */
     GIT_COMMIT?: string;
   }

@@ -1,27 +1,38 @@
 services:
   migrate:
-    image: amacneil/dbmate
+    image: benricheson101/csc-go-laundry-discord-migrate
+    build:
+      context: .
+      dockerfile: ./docker/migrate/Dockerfile
     command: up
     environment:
-      DATABASE_URL: sqlite3:${DATABASE_PATH}
+      DATABASE_URL: sqlite3:/data/${DATABASE_PATH:-database.db}
       DBMATE_WAIT: 'true'
     env_file:
       - .env
     volumes:
-      - ./db:/db
+      - ${DATABASE_PATH:-sqlite}:/data/${DATABASE_PATH}
 
   bot:
     image: benricheson101/csc-go-laundry-discord
     build:
       context: .
+      dockerfile: ./Dockerfile
       args:
         GIT_COMMIT: ${GIT_COMMIT}
     ports:
       - '${PORT}:${PORT}'
     env_file:
       - .env
+    environment:
+      DATABASE_PATH: /app/${DATABASE_PATH:-sqlite3/database.db}
+
     volumes:
-      - ${DATABASE_PATH}:/app/${DATABASE_PATH}
+      - ${DATABASE_PATH:-sqlite}:/app/${DATABASE_PATH:-./sqlite3}
+      - ./room_rename.json:/app/room_rename.json
     depends_on:
       migrate:
         condition: service_completed_successfully
+
+volumes:
+  sqlite:

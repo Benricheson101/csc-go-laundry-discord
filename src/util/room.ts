@@ -1,9 +1,11 @@
 import {hash} from 'node:crypto';
-import {existsSync, readFileSync} from 'node:fs';
+import {readFileSync, statSync} from 'node:fs';
 
 import type {LocationSummary, RoomMachineStatuses} from '../cscgo';
 
-const renames: {[key: string]: string} = existsSync('./room_rename.json')
+const renames: {[key: string]: string} = statSync('./room_rename.json', {
+  throwIfNoEntry: false,
+})?.isFile()
   ? JSON.parse(readFileSync('./room_rename.json', 'utf8'))
   : {};
 

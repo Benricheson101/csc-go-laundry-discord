@@ -11,7 +11,14 @@ jobs:
     permissions:
       packages: write
       contents: read
+    strategy:
+      matrix:
+        include:
+          - dockerfile: ./Dockerfile
+            image-name: ${{github.event.repository.name}}
 
+          - dockerfile: ./docker/migrate/Dockerfile
+            image: ${{github.event.repository.name}}-migrate
     steps:
       - uses: actions/checkout@v4
 
@@ -36,17 +43,19 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: |
-              ${{secrets.DOCKER_USERNAME}}/${{github.event.repository.name}}
-              ghcr.io/${{github.actor}}/${{github.event.repository.name}}
+              ${{secrets.DOCKER_USERNAME}}/${{matrix.image}}
+              ghcr.io/${{github.actor}}/${{matrix.image}}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,format=short
+            type=sha,format=short,prefix=
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v2
         with:
+          context: .
+          file: ${{matrix.dockerfile}}
           push: true
           tags: ${{steps.meta.outputs.tags}}
           labels: ${{steps.meta.outputs.labels}}
