@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - dockerfile: ./Dockerfile
-            image-name: ${{github.event.repository.name}}
+            image: ${{github.event.repository.name}}
 
           - dockerfile: ./docker/migrate/Dockerfile
             image: ${{github.event.repository.name}}-migrate
