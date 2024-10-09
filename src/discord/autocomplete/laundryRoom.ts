@@ -20,6 +20,7 @@ export const laundryRoomAutocomplate = (
 
   const location = ctx.cscgo.location;
   const rooms = location.rooms
+    .filter(r => r.connected)
     .map(r => ({name: toRoomName(r), value: r.roomId}))
     .filter(r => r.name.toLowerCase().includes(query.toLowerCase()))
     .toSorted((a, b) => (a.name < b.name ? -1 : 1))

@@ -21,6 +21,7 @@
     "@benricheson101/util": "^1.1.3",
     "better-sqlite3": "^11.3.0",
     "discord-api-types": "^0.37.101",
-    "discord-verify": "^1.2.0"
+    "discord-verify": "^1.2.0",
+    "dotenv": "^16.4.5"
   }
 }

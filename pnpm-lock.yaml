@@ -20,6 +20,9 @@ importers:
       discord-verify:
         specifier: ^1.2.0
         version: 1.2.0
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.3
@@ -249,6 +252,10 @@ packages:
   discord-verify@1.2.0:
     resolution: {integrity: sha512-8qlrMROW8DhpzWWzgNq9kpeLDxKanWa4EDVoj/ASVv2nr+dSr4JPmu2tFSydf3hAGI/OIJTnZyD0JulMYIxx4w==}
     engines: {node: '>=16'}
+
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
 
   end-of-stream@1.4.4:
     resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
@@ -658,6 +665,8 @@ snapshots:
   discord-verify@1.2.0:
     dependencies:
       '@types/express': 4.17.21
+
+  dotenv@16.4.5: {}
 
   end-of-stream@1.4.4:
     dependencies:

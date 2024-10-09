@@ -9,3 +9,4 @@
 /room_statuses.json
 /db/database.sqlite3
 *.vim
+.DS_STORE

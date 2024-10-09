@@ -1,4 +1,41 @@
-# CSCGo Discord
+# CSCGo Discord :tshirt:
+
+A live feed of a CSCGo campus laundry system in Discord! Featuring:
+
+- auto-updating kiosk-style message
+- notifications
+- room statuses
+
+## Demo
+
+<details open>
+    <summary>Live status of all laundry rooms on campus</summary>
+    ![kiosk](/screenshots/kiosk.png)
+</details>
+
+<details open>
+    <summary>Current view of a laundry room</summary>
+    ![room view](/screenshots/view-room.png)
+</details>
+
+<details open>
+    <summary>Interactive menus for creating notifications</summary>
+    ![notify](/screenshots/notify.png)
+    ![notifications](/screenshots/notification.png)
+</details>
+
+## Installing
+
+> [!WARNING]
+> This works using undocumented APIs that could change at any time.
+
+1. Install Docker
+2. Set up `.env` according to [/src/types/node.ts](/src/types/node.ts)
+3. `docker compose up -d`
+4. OPTIONAL: set up `room_rename.json` to rename any rooms
+
+> [!IMPORTANT]
+> Be mindful when setting `INTERVAL`. Because the API is not documented, I do not know what kinds of rate limits or anti-abuse systems are in place. Too short of an interval with a large number of laundry rooms may cause issues.
 
 ## Goals
 

@@ -1,6 +1,7 @@
-import type {
-  APIApplicationCommandInteraction,
-  RESTPostAPIApplicationCommandsJSONBody,
+import {
+    MessageFlags,
+  type APIApplicationCommandInteraction,
+  type RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
 import {Command, type Context} from '../interaction';
@@ -27,6 +28,8 @@ export class InfoCommand extends Command {
 
     return ctx.send({
       content: msg,
+      flags: MessageFlags.Ephemeral,
+      allowed_mentions: {parse: []},
     });
   }
 }

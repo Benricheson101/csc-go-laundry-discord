@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import assert from 'node:assert';
 
 import {CSCGo} from './cscgo';
@@ -18,7 +20,7 @@ import {Logger} from './util/logger';
 // TODO: limit number of kiosk messages per server?
 // TODO: handle deleted kiosk messages
 
-const interval = Number(process.env.INTERVAL) || 60_000;
+const interval = Number(process.env.INTERVAL) * 1_000 || 60_000;
 process.env.INTERVAL = interval.toString();
 
 const location = process.env.CSCGO_LOCATION!;
@@ -27,7 +29,7 @@ assert(location);
 const discordToken = process.env.DISCORD_TOKEN;
 assert(discordToken);
 
-const dbFile = process.env.DATABASE_PATH || './db/database.sqlite3';
+const dbFile = process.env.DATABASE_PATH || './db/database.db';
 
 const main = async () => {
   const logger = Logger.withValues({service: 'main'});
