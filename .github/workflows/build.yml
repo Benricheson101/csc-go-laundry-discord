@@ -22,9 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: echo "commit_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-        id: vars
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -59,4 +56,4 @@ jobs:
           push: true
           tags: ${{steps.meta.outputs.tags}}
           labels: ${{steps.meta.outputs.labels}}
-          build-args: GIT_COMMIT=${{steps.vars.output.commit_short}}
+          build-args: GIT_COMMIT=${{github.sha}}

@@ -9,7 +9,7 @@ import {Command, type Context} from '../interaction';
 const AUTHOR = '[@index.ts](<https://discord.com/users/255834596766253057>)';
 const SUPPORT_DISCORD = 'https://discord.gg/GmaW9dYwZf';
 const GITHUB_URL = 'https://github.com/Benricheson101/csc-go-laundry-discord';
-const GIT_REVISION = process.env.GIT_COMMIT || 'unknown';
+const GIT_REVISION = process.env.GIT_COMMIT?.slice(0, 7) || 'unknown';
 
 export class InfoCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {
