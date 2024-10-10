@@ -32,7 +32,7 @@ A live feed of a CSCGo campus laundry system in Discord! Featuring:
 > [!WARNING]
 > This project uses undocumented APIs that could change at any time.
 
-1. [Create an application on Discord](https://discord.com/developers/applications)
+1. [Create an application on Discord](https://discord.com/developers/applications) and set the interaction URL to `https://<your-domain>/i`
 2. Set up `.env` according to [/src/types/node.ts](/src/types/node.ts)
 3. `docker compose up -d`
 4. OPTIONAL: set up `room_rename.json` to rename any rooms
