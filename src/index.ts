@@ -58,7 +58,9 @@ const main = async () => {
 
   discordSvc.addCommands(commands);
   discordSvc.addSelectMenus(selectMenus);
-  //console.log(await discordSvc.createDiscordCommands());
+
+  const createdCmds = await discordSvc.createDiscordCommands();
+  logger.info('created discord commands', {cmds: createdCmds.length});
 
   const run = async () => {
     const before = Date.now();

@@ -8,6 +8,7 @@ import type {
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
   RESTPutAPIApplicationCommandsJSONBody,
+  RESTPutAPIApplicationCommandsResult,
 } from 'discord-api-types/v10';
 
 export class DiscordAPI {
@@ -60,7 +61,7 @@ export class DiscordAPI {
     }).then(r => r.json() as Promise<APIDMChannel>);
   }
 
-  async createCommands(cmds: RESTPutAPIApplicationCommandsJSONBody) {
+  async createCommands(cmds: RESTPutAPIApplicationCommandsJSONBody): Promise<RESTPutAPIApplicationCommandsResult> {
     const appID = Buffer.from(
       this.#botToken.split('.')[0],
       'base64'
@@ -72,7 +73,7 @@ export class DiscordAPI {
         authorization: `Bot ${process.env.DISCORD_TOKEN!}`,
       },
       body: JSON.stringify(cmds),
-    });
+    }).then(r => r.json() as Promise<RESTPutAPIApplicationCommandsResult>);
   }
 
   async respondInteraction(i: APIInteraction, msg: APIInteractionResponse) {
