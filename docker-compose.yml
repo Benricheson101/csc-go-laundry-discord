@@ -20,13 +20,13 @@ services:
       dockerfile: ./Dockerfile
       args:
         GIT_COMMIT: ${GIT_COMMIT}
+    restart: always
     ports:
       - '${PORT}:${PORT}'
     env_file:
       - .env
     environment:
       DATABASE_PATH: /app/${DATABASE_PATH:-sqlite3/database.db}
-
     volumes:
       - ${DATABASE_PATH:-sqlite}:/app/${DATABASE_PATH:-./sqlite3}
       - ./room_rename.json:/app/room_rename.json
