@@ -32,10 +32,11 @@ A live feed of a CSCGo campus laundry system in Discord! Featuring:
 > [!WARNING]
 > This project uses undocumented APIs that could change at any time.
 
-1. [Create an application on Discord](https://discord.com/developers/applications) and set the interaction URL to `https://<your-domain>/i`
-2. Set up `.env` according to [/src/types/node.ts](/src/types/node.ts)
-3. `docker compose up -d`
-4. OPTIONAL: set up `room_rename.json` to rename any rooms
+1. Download [docker-compose.yml](/docker-compose.yml)
+2. [Create an application on Discord](https://discord.com/developers/applications) and set the interaction URL to `https://<your-domain>/i`
+3. Set up `.env` according to [/src/types/node.ts](/src/types/node.ts)
+4. `docker compose up -d`
+5. OPTIONAL: set up `room_rename.json` to rename any rooms
 
 > [!IMPORTANT]
 > Be mindful when setting `INTERVAL`. Because the API is not documented, I do not know what kinds of rate limits or anti-abuse systems are in place. Too short of an interval with a large number of laundry rooms may cause issues.

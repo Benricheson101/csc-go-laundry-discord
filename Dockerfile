@@ -9,4 +9,4 @@ COPY ./package.json ./pnpm-lock.yaml ./tsconfig.json ./LICENSE ./
 RUN pnpm i
 COPY . .
 RUN pnpm tsc
-ENTRYPOINT ["node", "./build/src/index.js"]
+ENTRYPOINT ["node", "--enable-source-maps", "./build/src/index.js"]
