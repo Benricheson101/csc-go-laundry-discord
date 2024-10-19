@@ -302,6 +302,6 @@ export class DiscordService {
   }
 
   async createDiscordCommands() {
-    return this.dapi.createCommands([...this.cmds.values().map(c => c.meta)]);
+    return this.dapi.createCommands([...this.cmds.values()].map(c => c.meta));
   }
 }

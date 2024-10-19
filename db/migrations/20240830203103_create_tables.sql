@@ -15,7 +15,6 @@ create table subscriptions (
   type int not null check (type in (0, 1)),
   room_id varchar(11) not null,
 
-  -- TODO: is there some kind of index I can do to make sure these aren't null when they shouldn't be?
   machine_id integer,
   machine_type int check (machine_type in (0, 1))
 );
