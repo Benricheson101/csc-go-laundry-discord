@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:lts-slim
 
 ARG GIT_COMMIT
 ENV GIT_COMMIT=${GIT_COMMIT}
