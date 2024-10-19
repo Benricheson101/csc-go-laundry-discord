@@ -1,6 +1,6 @@
-FROM node
+FROM node:alpine
 
-RUN apt update && apt install -y sqlite3
+RUN apk add python3 make gcc g++ musl-dev
 
 ARG GIT_COMMIT
 ENV GIT_COMMIT=${GIT_COMMIT}
