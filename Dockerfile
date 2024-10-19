@@ -1,5 +1,7 @@
 FROM node
 
+RUN apt update && apt install -y sqlite3
+
 ARG GIT_COMMIT
 ENV GIT_COMMIT=${GIT_COMMIT}
 

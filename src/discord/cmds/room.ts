@@ -41,7 +41,10 @@ export class RoomCommand extends Command {
       ctx.cscgo.getRoomMachines(laundryRoom),
     ]);
 
-    ctx.send(generateViewRoomMessage(roomSummary, roomMachines));
+    const msg = generateViewRoomMessage(roomSummary, roomMachines);
+    msg.flags! &= ~MessageFlags.Ephemeral;
+
+    ctx.send(msg);
   }
 
   async autocomplete(

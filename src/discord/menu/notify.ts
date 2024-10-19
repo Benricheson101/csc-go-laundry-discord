@@ -20,6 +20,8 @@ export class NotifyMeSelectMenu extends SelectMenu {
     const [, roomID] = ctx.i.data.custom_id.split('_');
     const value = ctx.i.data.values[0] as 'specific' | 'dryer' | 'washer';
 
+    const updateMsg = !!(ctx.i.message.flags! & MessageFlags.Ephemeral);
+
     switch (value) {
       case 'specific': {
         const [roomSummary, roomMachines] = await Promise.all([
@@ -28,7 +30,12 @@ export class NotifyMeSelectMenu extends SelectMenu {
         ]);
 
         const msg = generateNotifyMeMessage(roomSummary, roomMachines);
-        ctx.update(msg);
+        if (updateMsg) {
+          ctx.update(msg);
+        } else {
+          ctx.send(msg);
+        }
+
         return;
       }
 
@@ -39,11 +46,16 @@ export class NotifyMeSelectMenu extends SelectMenu {
           DBMachineTypeMap[value],
           roomID
         );
-        ctx.update(
-          generateNotifySubscribeNextAvailableSuccessMessage(
-            value as MachineType
-          )
+
+        const msg = generateNotifySubscribeNextAvailableSuccessMessage(
+          value as MachineType
         );
+
+        if (updateMsg) {
+          ctx.update(msg);
+        } else {
+          ctx.send(msg);
+        }
 
         if (!ctx.db.hasDMChannelID(ctx.user.id)) {
           const dmChannel = await ctx.dapi.createDM(ctx.user.id);
