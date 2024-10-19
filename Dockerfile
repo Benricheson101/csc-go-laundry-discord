@@ -1,4 +1,4 @@
-FROM node:slim
+FROM node
 
 ARG GIT_COMMIT
 ENV GIT_COMMIT=${GIT_COMMIT}
