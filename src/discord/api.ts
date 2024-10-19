@@ -61,7 +61,9 @@ export class DiscordAPI {
     }).then(r => r.json() as Promise<APIDMChannel>);
   }
 
-  async createCommands(cmds: RESTPutAPIApplicationCommandsJSONBody): Promise<RESTPutAPIApplicationCommandsResult> {
+  async createCommands(
+    cmds: RESTPutAPIApplicationCommandsJSONBody
+  ): Promise<RESTPutAPIApplicationCommandsResult> {
     const appID = Buffer.from(
       this.#botToken.split('.')[0],
       'base64'

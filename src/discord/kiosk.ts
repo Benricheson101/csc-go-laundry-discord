@@ -40,7 +40,7 @@ export const generateKioskMessage = (
     },
   };
 
-  const add = 3 - (embed.fields!.length % 3);
+  const add = (3 - (embed.fields!.length % 3)) % 3;
   embed.fields!.push(
     ...Array.from({length: add}, () => ({
       name: '\u200b',

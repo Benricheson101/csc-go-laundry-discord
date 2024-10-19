@@ -113,7 +113,7 @@ export const generateNotifyMeMessage = (
                 // TODO: should this use sticker number or time remaining? sticker makes more sense but
                 // the embed uses time remaining so it's weird to have different orders
                 //.toSorted((a, b) => a.stickerNumber - b.stickerNumber)
-                .toSorted((a, b) => a.timeRemaining - b.timeRemaining)
+                .toSorted((a, b) => b.timeRemaining - a.timeRemaining)
                 .map(m => ({
                   label: `${capitalize(m.type)} #${m.stickerNumber} (${m.timeRemaining}m remaining)`,
                   value: `${m.type}_${m.stickerNumber}`,

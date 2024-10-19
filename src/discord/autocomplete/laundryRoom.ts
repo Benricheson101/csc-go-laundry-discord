@@ -1,9 +1,11 @@
 import assert from 'node:assert';
+
 import {
   type APIApplicationCommandAutocompleteInteraction,
   ApplicationCommandOptionType,
   InteractionResponseType,
 } from 'discord-api-types/v10';
+
 import {toRoomName} from '../../util/room';
 import type {Context} from '../interaction';
 

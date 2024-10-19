@@ -1,20 +1,25 @@
+import {chunk} from '@benricheson101/util';
+
 import {Logger} from './util/logger';
 
-// TODO: cache responses for a short time?
+const MAX_CONCURRENCY = 10;
+
 export class CSCGo {
+  private logger = Logger.withValues({class: 'CSCGo'});
+
   /** this shouldn't change so caching for faster responses */
   location!: LocationSummary;
 
   /** this shouldn't change so caching for faster responses. don't trust data that can change, though */
   machines!: {[key: string]: RoomMachine[]};
 
+  /** cache of the last time getAllRoomMachineStatuses() as called */
   lastAllRoomMachineStatuses?: AllRoomMachineStatuses;
 
   constructor(private locationID: string) {}
 
   async populateCache() {
     this.location = await this.getLocationSummary();
-    this.machines = await this.getAllRoomMachines();
   }
 
   async getLocationSummary(): Promise<LocationSummary> {
@@ -29,30 +34,76 @@ export class CSCGo {
     );
   }
 
-  async getRoomMachines(roomID: string) {
-    return fetch(this.#apiURL(`/room/${roomID}/machines`)).then(
-      r => r.json() as Promise<RoomMachine[]>
-    );
+  async getRoomMachines(roomID: string): Promise<RoomMachine[]> {
+    return fetch(this.#apiURL(`/room/${roomID}/machines`))
+      .then(r => r.json() as Promise<RoomMachine[]>)
+      .catch(err => {
+        this.logger.error('failed to get room machines', {roomID, err});
+        return err;
+      });
   }
 
   async getAllRoomMachines() {
+    type RoomMachinesEntry = [string, RoomMachine[]];
+
     const location = await this.getLocationSummary();
-    const roomMachines = await Promise.all(
-      location.rooms
-        .filter(r => r.connected)
-        .map(async r => [r.roomId, await this.getRoomMachines(r.roomId)])
+
+    const roomChunks = chunk(
+      location.rooms.filter(r => r.connected),
+      MAX_CONCURRENCY
     );
 
-    return Object.fromEntries(roomMachines);
+    const result: RoomMachinesEntry[] = [];
+    let totalFailed = 0;
+
+    for (const rooms of roomChunks) {
+      this.logger.verbose('getting room machines', {chunkSize: rooms.length});
+
+      const promises = rooms.map(
+        async r =>
+          [r.roomId, await this.getRoomMachines(r.roomId)] as readonly [
+            string,
+            RoomMachine[],
+          ]
+      );
+
+      const [success, failed]: readonly [
+        RoomMachinesEntry[],
+        PromiseRejectedResult[],
+      ] = await Promise.allSettled(promises).then(r =>
+        r.reduce(
+          (a, c) => (
+            a[c.status === 'fulfilled' ? 0 : 1].push(
+              ('value' in c ? c.value : c) as any
+            ),
+            a
+          ),
+          [[] as RoomMachinesEntry[], [] as PromiseRejectedResult[]]
+        )
+      );
+
+      totalFailed += failed.length;
+
+      result.push(...success);
+    }
+
+    if (totalFailed) {
+      this.logger.error('failed to fetch some room machines', {
+        failed: totalFailed,
+      });
+    }
+
+    this.logger.info('got machine statuses', {n: result.length});
+
+    const allRoomMachines = Object.fromEntries(result);
+    this.machines = allRoomMachines;
+    return allRoomMachines;
   }
 
   async getAllRoomMachineStatuses() {
     const location = await this.getLocationSummary();
-    const roomMachines = await Promise.all(
-      location.rooms
-        .filter(r => r.connected)
-        .map(r => this.getRoomMachines(r.roomId))
-    );
+
+    const roomMachines = Object.values(await this.getAllRoomMachines());
 
     const agg = roomMachines.reduce<AllRoomMachineStatuses['rooms']>(
       (a, c1) => (
