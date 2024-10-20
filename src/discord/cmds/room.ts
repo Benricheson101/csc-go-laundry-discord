@@ -2,6 +2,7 @@ import {
   type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  InteractionContextType,
   MessageFlags,
   type RESTPostAPIApplicationCommandsJSONBody,
   type APIApplicationCommandInteractionDataStringOption as StringOption,
@@ -14,6 +15,11 @@ export class RoomCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {
     name: 'view-room',
     description: 'view status of a room',
+    contexts: [
+      InteractionContextType.Guild,
+      InteractionContextType.BotDM,
+      InteractionContextType.PrivateChannel,
+    ],
     options: [
       {
         type: ApplicationCommandOptionType.String,

@@ -1,5 +1,6 @@
 import {
   type APIApplicationCommandInteraction,
+  InteractionContextType,
   MessageFlags,
   type RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
@@ -15,6 +16,11 @@ export class InfoCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {
     name: 'info',
     description: 'shows info about the bot',
+    contexts: [
+      InteractionContextType.Guild,
+      InteractionContextType.BotDM,
+      InteractionContextType.PrivateChannel,
+    ],
   };
 
   async run(ctx: Context<APIApplicationCommandInteraction>) {

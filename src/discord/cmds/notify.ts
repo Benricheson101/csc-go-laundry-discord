@@ -3,6 +3,7 @@ import {
   type APIApplicationCommandAutocompleteInteraction,
   type APIChatInputApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  InteractionContextType,
   MessageFlags,
   type APIApplicationCommandInteractionDataNumberOption as NumberOption,
   type RESTPostAPIApplicationCommandsJSONBody,
@@ -28,6 +29,11 @@ export class NotifyCommand extends Command {
   meta: RESTPostAPIApplicationCommandsJSONBody = {
     name: 'notify-me',
     description: 'manage laundry notifications',
+    contexts: [
+      InteractionContextType.Guild,
+      InteractionContextType.BotDM,
+      InteractionContextType.PrivateChannel,
+    ],
 
     options: [
       {
