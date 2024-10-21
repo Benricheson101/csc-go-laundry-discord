@@ -39,7 +39,7 @@ A live feed of a CSCGo campus laundry system in Discord! Featuring:
 5. OPTIONAL: set up `room_rename.json` to rename any rooms
 
 > [!IMPORTANT]
-> Be mindful when setting `INTERVAL`. Because the API is not documented, I do not know what kinds of rate limits or anti-abuse systems are in place. Too short of an interval with a large number of laundry rooms may cause issues.
+> Be mindful when setting `INTERVAL`. Because the API is not documented, I do not know what kinds of rate limits they have. Too short of an interval with a large number of laundry rooms may cause issues.
 
 ## Goals
 
